@@ -31,3 +31,15 @@ def test_un_lote_nuevo_no_modifica_el_anterior(tmp_path):
     antes = r1.read_bytes()
     escribir_parquet("trm", FILAS, l2, "f", ahora, tmp_path)
     assert r1.read_bytes() == antes
+
+
+def test_el_lote_de_un_csv_guarda_archivo_y_hash(tmp_path):
+    lote = uuid.uuid4()
+    ahora = datetime(2026, 10, 28, tzinfo=UTC)
+    meta = {"archivo": "ipc.csv", "hash_archivo": "abc123"}
+    ruta = escribir_parquet("ipc", [{"Índice": "100,60"}], lote, "f", ahora, tmp_path, meta)
+    tabla = pq.read_table(ruta).to_pylist()
+    assert tabla == [
+        {"Índice": "100,60", "lote_id": str(lote), "fuente": "f", "cargado_en": ahora,
+         "archivo": "ipc.csv", "hash_archivo": "abc123"}
+    ]

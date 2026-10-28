@@ -159,10 +159,11 @@ lakehouse-financiero/
 ├── .env.example               # Variables de entorno sin secretos reales
 ├── pipeline.py                # Comando único: ingesta → dbt build (RF-08)
 ├── verificar.py               # Verificación local antes de cada PR (sección 7.1)
+├── data/fuentes/             # CSV del Banco de la República (IPC y tasa), versionados (D-10)
 ├── ingesta/
 │   ├── extractores/
 │   │   ├── trm_socrata.py
-│   │   └── banrep.py          # IPC y tasa de intervención
+│   │   └── banrep.py          # Lector de los CSV de IPC y tasa de intervención
 │   ├── carga_bronze.py
 │   └── tests/                 # pytest
 ├── dbt/
