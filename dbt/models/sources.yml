@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: trm_raw
+        description: TRM tal como la entrega la fuente, un lote por ejecución del extractor.

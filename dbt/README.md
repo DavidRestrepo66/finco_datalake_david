@@ -1,0 +1,16 @@
+# dbt: capas silver y gold
+
+Lee `bronze.*` de PostgreSQL y construye `silver` (y luego `gold`). Las credenciales vienen del
+entorno (`.env`), no de `profiles.yml`.
+
+```bash
+python -m venv .venv && .venv/bin/pip install -r dbt/requirements.txt
+set -a; . ./.env; set +a
+cd dbt && ../.venv/bin/dbt build --profiles-dir .
+```
+
+`dbt build` corre los modelos, las pruebas `unique`/`not_null` y las pruebas unitarias.
+
+| Modelo | Tabla | Regla |
+|---|---|---|
+| `silver_trm` | `silver.trm` | Una fila por día calendario. Cada vigencia de bronze se expande a sus días; si un día está en dos lotes gana el más reciente (HU-07). |
