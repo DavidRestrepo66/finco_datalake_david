@@ -11,7 +11,7 @@ Orden fijado por el PO: Docker, luego ingesta. Fuente: `06-product-backlog.md`.
 ## Tasks
 - T1 (S1, S2) Docker Compose: PostgreSQL con esquemas + Metabase. [x]
 - T2 (S3) Extractor TRM y carga a bronze. [x]
-- T3 (S4) Cargador CSV de IPC y tasa. [ ]
+- T3 (S4) Cargador CSV de IPC y tasa. [x] Pendiente: versionar los CSV reales en `data/fuentes/` (descarga manual del PO).
 
 - T4 (S5) Escribir bronze como Parquet por lote (TRM, luego IPC y tasa). [x]
 - T5 (S5) Actualizar documentos y glosario: lakehouse híbrido reemplaza a D-12. [x]
@@ -19,3 +19,4 @@ Orden fijado por el PO: Docker, luego ingesta. Fuente: `06-product-backlog.md`.
 ## Log
 - L1: "no, quiero que lo hagamos en orden" -> orden del plan de sprints, MVP primero.
 - L2: "quiero que se trate como un lakehouse haciendo referencia a una arquitectura moderna" -> elegido híbrido: bronze en Parquet, silver/gold en PostgreSQL.
+- L3: "si continua con t3" -> cargador genérico: la fila del CSV va completa como jsonb (texto) en PostgreSQL y como columnas de texto en Parquet. Lote con archivo y SHA-256. Los CSV reales aún no están en el repositorio.
