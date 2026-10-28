@@ -6,6 +6,7 @@ Orden fijado por el PO: Docker, luego ingesta. Fuente: `06-product-backlog.md`.
 - S2: Se copia `.env.example` a `.env`; sin secretos reales en el repositorio.
 - S3: HU-03 TRM desde 2020-01-01 en bronze, con fuente, fecha-hora de carga e identificador de lote (API ceyp-9c7c).
 - S4: HU-04/05 IPC (desde 2019-01) y tasa de intervención desde CSV versionado en el repositorio, con metadatos de lote (nombre de archivo y hash).
+- S5: Arquitectura lakehouse híbrida: bronze se escribe como archivos Parquet inmutables por lote (el lake, fuente de verdad) y se replica en PostgreSQL `bronze` para que dbt construya silver y gold ahí (el house).
 
 ## Tasks
 - T1 (S1, S2) Docker Compose: PostgreSQL con esquemas + Metabase. [x]
