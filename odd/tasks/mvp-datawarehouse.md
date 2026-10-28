@@ -9,7 +9,7 @@ Orden fijado por el PO: Docker, luego ingesta. Fuente: `06-product-backlog.md`.
 
 ## Tasks
 - T1 (S1, S2) Docker Compose: PostgreSQL con esquemas + Metabase. [x]
-- T2 (S3) Extractor TRM y carga a bronze. [ ]
+- T2 (S3) Extractor TRM y carga a bronze. [x]
 - T3 (S4) Cargador CSV de IPC y tasa. [ ]
 
 ## Log
