@@ -4,4 +4,3 @@ __pycache__/
 .venv/
 dbt/target/
 dbt/logs/
-data/bronze/
