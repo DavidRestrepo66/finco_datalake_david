@@ -1,4 +1,4 @@
-# Plan de Ciclo de Vida del Software — Lakehouse Analítico de Datos Financieros Públicos
+# Plan de Ciclo de Vida del Software — Lakehouse Analítico de Datos Financieros Públicos (arquitectura híbrida: bronze en Parquet, silver y gold en PostgreSQL con dbt)
 
 **Materia:** Ingeniería de Software — Universidad Católica Luis Amigó
 **Metodología:** Scrum (4 sprints de 2 semanas)

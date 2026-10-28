@@ -14,7 +14,7 @@ Orden fijado por el PO: Docker, luego ingesta. Fuente: `06-product-backlog.md`.
 - T3 (S4) Cargador CSV de IPC y tasa. [ ]
 
 - T4 (S5) Escribir bronze como Parquet por lote (TRM, luego IPC y tasa). [x]
-- T5 (S5) Actualizar documentos y glosario: lakehouse híbrido reemplaza a D-12. [ ]
+- T5 (S5) Actualizar documentos y glosario: lakehouse híbrido reemplaza a D-12. [x]
 
 ## Log
 - L1: "no, quiero que lo hagamos en orden" -> orden del plan de sprints, MVP primero.
