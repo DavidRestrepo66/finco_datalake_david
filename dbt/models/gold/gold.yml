@@ -45,6 +45,49 @@ models:
       - name: lote_id
         description: Lote de bronze del que viene el valor.
 
+  - name: fact_indicadores_mensual
+    description: >
+      Hecho mensual de indicadores, desde enero de 2020. Viene de silver.ipc y
+      silver.tasa_intervencion; la tasa es la vigente el último día del mes.
+    columns:
+      - name: anio_mes
+        description: Primer día del mes. Llave del hecho y referencia a dim_fecha.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_fecha')
+                field: fecha
+      - name: ipc
+        description: Índice de Precios al Consumidor del mes (de silver.ipc.indice).
+        data_tests: [not_null]
+      - name: inflacion_anual
+        description: Variación porcentual del IPC frente al mismo mes del año anterior, calculada con silver.ipc.
+        data_tests: [not_null]
+      - name: tasa_vigente
+        description: Tasa de política monetaria vigente el último día del mes (de silver.tasa_intervencion.tasa).
+        data_tests: [not_null]
+
+  - name: mart_mensual
+    description: >
+      Mart mensual para el tablero y la app: una fila por mes con TRM promedio (de
+      fact_trm_diaria) y el IPC, la inflación anual y la tasa vigente (de fact_indicadores_mensual).
+      El mes sin TRM queda con trm_promedio nulo.
+    columns:
+      - name: anio_mes
+        description: Primer día del mes. Llave del mart.
+        data_tests: [unique, not_null]
+      - name: trm_promedio
+        description: Promedio de la TRM diaria del mes, en pesos por dólar (de gold.fact_trm_diaria.valor).
+      - name: ipc
+        description: IPC del mes (de gold.fact_indicadores_mensual.ipc).
+      - name: inflacion_anual
+        description: Inflación anual en porcentaje (de gold.fact_indicadores_mensual.inflacion_anual).
+      - name: tasa_vigente
+        description: Tasa de política monetaria vigente al cierre del mes (de gold.fact_indicadores_mensual.tasa_vigente).
+
+
 unit_tests:
   - name: dim_fecha_cubre_cada_dia_desde_2019
     description: Genera un día por fila desde 2019-01-01 hasta el último día de la TRM, con sus atributos.
