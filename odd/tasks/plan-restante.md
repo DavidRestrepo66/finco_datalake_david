@@ -16,9 +16,9 @@ Estado al 2026-10-29: hechas HU-01, 03, 07, 10, 12, 14; HU-04/05 sin CSV reales;
 ## Tasks (ID, specs, responsable, fecha Gantt)
 ### Sprint 2 (hasta 1 nov)
 - T1 (S1) Versionar CSV reales de IPC y tasa en `data/fuentes/` y cargarlos. David, 30 oct–1 nov. [x] cargados en bronze el 29 oct (867 y 10485 filas); falta commit de los CSV.
-- T2 (S9) T-02 Casos de uso y flujos (`docs/casos-uso.md`). David, hasta 8 nov. [ ]
-- T3 (S9) T-03 Diagrama de arquitectura. Andrey, 29 oct–1 nov. [ ]
-- T4 (S9) T-04 ER de 3 capas y ADR Opción B. Juan, 26 oct–1 nov. [ ]
+- T2 (S9) T-02 Casos de uso y flujos (`docs/casos-uso.md`). David, hasta 8 nov. [x] commit docs: casos de uso y flujos.
+- T3 (S9) T-03 Diagrama de arquitectura. Andrey, 29 oct–1 nov. [x] docs/arquitectura.md
+- T4 (S9) T-04 ER de 3 capas y ADR Opción B. Juan, 26 oct–1 nov. [x] docs/modelo-datos.md
 ### Sprint 3 (2–8 nov)
 - T5 (S2) HU-08 Silver de IPC y tasa por vigencia. Juan, 3–6 nov. [ ] depende T1
 - T6 (S3) HU-09 Completar: hecho mensual y mart mensual. Juan, 4–8 nov. [ ] depende T5
