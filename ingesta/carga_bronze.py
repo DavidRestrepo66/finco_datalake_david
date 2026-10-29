@@ -13,6 +13,7 @@ se guarda completa como `jsonb` (texto original), porque el formato del Banco pu
 cambiar de columnas sin que bronze tenga que cambiar.
 """
 
+import logging
 import os
 import sys
 import uuid
@@ -161,7 +162,7 @@ def main_csv(conjunto, ruta):
 
 
 def main(argv):
-    from ingesta.extractores.trm_socrata import extraer_trm
+    from ingesta.extractores.trm_socrata import ExtraccionError, extraer_trm
 
     if len(argv) in (1, 2) and argv[0] in ("ipc", "tasa"):
         conjunto = "ipc" if argv[0] == "ipc" else "tasa_intervencion"
@@ -169,7 +170,12 @@ def main(argv):
     if argv != ["trm"]:
         print(USO, file=sys.stderr)
         return 2
-    filas = extraer_trm()
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        filas = extraer_trm()
+    except ExtraccionError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
     lote = uuid.uuid4()
     ahora = datetime.now(UTC)
     ruta = escribir_parquet("trm", filas, lote, FUENTE_TRM, ahora)
