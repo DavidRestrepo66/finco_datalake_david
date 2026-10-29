@@ -12,7 +12,7 @@ import sys
 
 VERIFICACIONES = [
     ("ruff", ["ruff", "check", "ingesta/", "pipeline.py", "verificar.py"]),
-    ("pytest", ["pytest", "ingesta", "-q"]),
+    ("pytest", [sys.executable, "-m", "pytest", "ingesta", "-q"]),
     ("dbt", ["dbt", "build", "--project-dir", "dbt", "--profiles-dir", "dbt"]),
 ]
 
