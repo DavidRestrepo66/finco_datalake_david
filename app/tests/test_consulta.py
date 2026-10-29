@@ -57,3 +57,27 @@ def test_a_csv_tiene_encabezado_y_exactamente_las_filas():
 
 def test_a_csv_sin_filas_no_genera_archivo():
     assert consulta.a_csv(["fecha", "valor"], []) is None
+
+
+def test_conjuntos_ofrece_el_mart_mensual():
+    assert "mart_mensual" in consulta.CONJUNTOS
+
+
+def test_consultar_mart_mensual_filtra_por_anio_mes_y_ordena():
+    filas = [(dt.date(2023, 1, 1), 4600.5, 120.1, 12.5, 11.0)]
+    columnas_mart = ["anio_mes", "trm_promedio", "ipc", "inflacion_anual", "tasa_vigente"]
+    con = ConexionFalsa(columnas_mart, filas)
+    columnas, resultado = consulta.consultar(con, "mart_mensual", dt.date(2023, 1, 1), dt.date(2023, 6, 30))
+    assert columnas == columnas_mart
+    assert resultado == filas
+    sentencia, params = con.llamadas[0]
+    assert '"gold"."mart_mensual"' in sentencia
+    assert '"anio_mes" between' in sentencia and 'order by "anio_mes"' in sentencia
+    assert params == (dt.date(2023, 1, 1), dt.date(2023, 6, 30))
+
+
+def test_mart_mensual_csv_tiene_exactamente_las_filas_y_vacio_no_genera_archivo():
+    cols = ["anio_mes", "trm_promedio", "ipc", "inflacion_anual", "tasa_vigente"]
+    texto = consulta.a_csv(cols, [(dt.date(2023, 1, 1), 4600.5, 120.1, 12.5, 11.0)])
+    assert texto.splitlines() == ["anio_mes,trm_promedio,ipc,inflacion_anual,tasa_vigente", "2023-01-01,4600.5,120.1,12.5,11.0"]
+    assert consulta.a_csv(cols, []) is None
