@@ -16,6 +16,7 @@ ETAPAS = [
     ("ingesta IPC", [sys.executable, "-m", "ingesta.carga_bronze", "ipc"]),
     ("ingesta tasa de intervención", [sys.executable, "-m", "ingesta.carga_bronze", "tasa"]),
     ("dbt build", ["dbt", "build", "--project-dir", "dbt", "--profiles-dir", "dbt"]),
+    ("tablero Metabase", [sys.executable, "-m", "metabase.tablero"]),
 ]
 
 

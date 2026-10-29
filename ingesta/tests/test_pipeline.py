@@ -22,8 +22,8 @@ def _nombres(corredor):
 def test_ejecuta_en_orden_ingesta_de_las_fuentes_y_dbt_build(capsys):  # HU-12 escenario 1
     corredor = Corredor()
     assert pipeline.main([], correr=corredor, reloj=iter([0.0, 12.5]).__next__) == 0
-    assert _nombres(corredor) == ["trm", "ipc", "tasa", "dbt"]
-    assert corredor.comandos[-1][:2] == ["dbt", "build"]
+    assert _nombres(corredor) == ["trm", "ipc", "tasa", "dbt", "metabase.tablero"]
+    assert corredor.comandos[-2][:2] == ["dbt", "build"]
 
 
 def test_informa_la_duracion_total(capsys):  # HU-12 escenario 1
@@ -49,3 +49,9 @@ def test_si_dbt_falla_termina_con_su_codigo_e_indica_la_etapa(capsys):
 def test_argumentos_no_esperados_muestran_el_uso(capsys):
     assert pipeline.main(["x"], correr=Corredor()) == 2
     assert capsys.readouterr().err == "uso: python pipeline.py\n"
+
+
+def test_si_el_tablero_falla_indica_la_etapa(capsys):  # HU-13: tablero creado por script
+    corredor = Corredor(falla_en="metabase.tablero", codigo=1)
+    assert pipeline.main([], correr=corredor, reloj=iter([0.0, 1.0]).__next__) == 1
+    assert "falló la etapa «tablero Metabase»" in capsys.readouterr().err
