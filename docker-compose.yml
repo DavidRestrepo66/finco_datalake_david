@@ -31,5 +31,21 @@ services:
     ports:
       - "${METABASE_PORT:-3000}:3000"
 
+  pipeline:
+    build: .
+    profiles: ["pipeline"]  # no arranca con `up`; se ejecuta con `docker compose run --rm pipeline`
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      LAKE_DIR: /app/data/bronze
+    volumes:
+      - ./data:/app/data
+
 volumes:
   pgdata:
