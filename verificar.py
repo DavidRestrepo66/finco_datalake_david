@@ -11,8 +11,8 @@ import subprocess
 import sys
 
 VERIFICACIONES = [
-    ("ruff", ["ruff", "check", "ingesta/", "pipeline.py", "verificar.py"]),
-    ("pytest", [sys.executable, "-m", "pytest", "ingesta", "-q"]),
+    ("ruff", ["ruff", "check", "ingesta/", "app/", "pipeline.py", "verificar.py"]),
+    ("pytest", [sys.executable, "-m", "pytest", "ingesta", "app", "-q"]),
     ("dbt", ["dbt", "build", "--project-dir", "dbt", "--profiles-dir", "dbt"]),
 ]
 

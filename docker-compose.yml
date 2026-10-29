@@ -47,5 +47,21 @@ services:
     volumes:
       - ./data:/app/data
 
+  app:
+    build: .
+    command: streamlit run app/app.py --server.port 8501 --server.address 0.0.0.0
+    profiles: ["app"]  # se levanta con `docker compose --profile app up app`
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${APP_PORT:-8501}:8501"
+
 volumes:
   pgdata:
