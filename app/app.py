@@ -1,5 +1,9 @@
 """App web Streamlit (HU-14): ver datos de gold, filtrarlos por fechas y descargarlos en CSV.
 
+Conjuntos: TRM diaria (gold.fact_trm_diaria) y mart mensual (gold.mart_mensual: anio_mes, trm_promedio,
+ipc, inflacion_anual, tasa_vigente). En el mart mensual el rango filtra por `anio_mes` (primer día de cada mes).
+Un rango sin datos muestra un mensaje y no ofrece descarga.
+
 Uso: streamlit run app/app.py   (o `docker compose up app`)
 """
 
@@ -11,7 +15,7 @@ import streamlit as st
 
 from app import consulta
 
-ETIQUETAS = {"trm_diaria": "TRM diaria"}
+ETIQUETAS = {"trm_diaria": "TRM diaria", "mart_mensual": "Mart mensual (TRM, IPC, inflación, tasa)"}
 
 
 def conectar():
@@ -39,5 +43,6 @@ else:
     if contenido is None:
         st.info("No hay datos en el rango elegido.")
     else:
+        st.caption(f"Vista previa: {len(filas)} filas")
         st.dataframe([dict(zip(columnas, fila)) for fila in filas])
         st.download_button("Descargar CSV", contenido, file_name=f"{conjunto}_{desde}_{hasta}.csv", mime="text/csv")

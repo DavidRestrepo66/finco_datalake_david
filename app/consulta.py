@@ -8,9 +8,10 @@ import io
 
 from psycopg import sql
 
-# conjunto -> (esquema, tabla, columna de fecha). El mart mensual se agrega con HU-09 parte B.
+# conjunto -> (esquema, tabla, columna de fecha). El mart mensual filtra por `anio_mes` (primer día del mes).
 CONJUNTOS = {
     "trm_diaria": ("gold", "fact_trm_diaria", "fecha"),
+    "mart_mensual": ("gold", "mart_mensual", "anio_mes"),
 }
 
 
