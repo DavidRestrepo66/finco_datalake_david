@@ -14,3 +14,5 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 | Modelo | Tabla | Regla |
 |---|---|---|
 | `silver_trm` | `silver.trm` | Una fila por día calendario. Cada vigencia de bronze se expande a sus días; si un día está en dos lotes gana el más reciente (HU-07). |
+| `dim_fecha` | `gold.dim_fecha` | Un día calendario por fila, desde `fecha_inicio_dim` (2019-01-01) hasta el último día con TRM (HU-09). |
+| `fact_trm_diaria` | `gold.fact_trm_diaria` | Hecho diario de la TRM. `relationships` contra `dim_fecha`: falla e identifica fechas huérfanas (HU-10). |
