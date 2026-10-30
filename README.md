@@ -8,6 +8,33 @@
 
 ---
 
+## Inicio rápido (instalación para el evaluador)
+
+Requisitos: solo Docker con Compose. No hace falta Python ni datos previos del proyecto.
+
+```sh
+git clone https://github.com/DavidRestrepo66/finco_datalake_david.git
+cd finco_datalake_david
+cp .env.example .env
+docker compose up -d                 # PostgreSQL (bronze, silver, gold) y Metabase
+docker compose run --rm pipeline     # ingesta de TRM, IPC y tasa + dbt build + tablero
+```
+
+Cuando el pipeline imprime `Pipeline completo en …`, los datos están cargados y el tablero quedó creado.
+
+| Qué | Cómo |
+|---|---|
+| Tablero «Tablero macroeconómico» | http://localhost:3000 |
+| App web de consulta y descarga CSV | `docker compose --profile app up app` → http://localhost:8501 |
+| Linaje de dbt | `cd dbt && dbt docs generate --profiles-dir . && dbt docs serve --profiles-dir .` |
+
+Los puertos y las credenciales se toman de `.env` (copiado de `.env.example`). La primera
+ejecución descarga las imágenes de Docker y consulta la API de Socrata para la TRM, así que
+necesita conexión a internet. El detalle de cada componente está en `docs/manual.md` y una
+corrida de referencia en `docs/evidencia/ejecucion-2026-10-30.md`.
+
+---
+
 ## 0. Cómo usar este documento
 
 Este archivo es el **plan operativo** del proyecto: dice qué se hace en cada fase del ciclo de vida, en qué sprint, quién lo hace y qué artefacto queda como evidencia. El documento base sigue siendo la fuente de verdad del **alcance**; este documento lo aterriza en fechas, tareas y plantillas.
