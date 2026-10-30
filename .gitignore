@@ -6,3 +6,4 @@ dbt/target/
 dbt/logs/
 data/bronze/
 dbt/.user.yml
+.engram/
