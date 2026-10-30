@@ -14,16 +14,18 @@ Cadena de PR apilados a main; cada PR ≤ 400 líneas; el PO mergea en orden.
 - S9: HU-02 "Instalar y ejecutar siguiendo solo el README (solo Docker)". Documentos T-02 a T-09 del backlog (casos de uso, arquitectura, ER y ADR, trazabilidad, plan de pruebas, evidencia, manuales, retrospectiva).
 
 ## Tasks
-- T1 (S1) HU-06 reintentos y errores del extractor TRM. [x] rama feature/HU-06-reintentos-trm
-- T2 (S3, S4) Gold con la TRM: dim_fecha, hecho diario de TRM, pruebas relationships (HU-09 parte A, HU-10). [ ] sobre HU-07
-- T3 (S6) Pipeline de un comando en Docker: `pipeline.py`, `verificar.py`, servicio `pipeline` (HU-12). [ ]
-- T4 (S2) IPC y tasa en silver (HU-08). [ ] BLOQUEADA: faltan los CSV reales que descarga el usuario en `data/fuentes/`
-- T5 (S3, S4) Hecho mensual y mart mensual (HU-09 parte B, HU-10). [ ] depende de T4
-- T6 (S8) App web Streamlit de consulta y descarga (HU-14). [ ] depende de T2; mart mensual cuando exista T5
-- T7 (S7) Tablero Metabase creado por script contra su API (HU-13). [ ] depende de T5
-- T8 (S5) Linaje: descripciones de columnas y dbt docs (HU-11). [ ] depende de T5
-- T9 (S9) Documentos T-02 a T-08, trazabilidad y README para HU-02. [ ] al final de cada HU lo que le toque
+- T1 (S1) HU-06 reintentos y errores del extractor TRM. [x] rama feature/HU-06-reintentos-trm (PR #8)
+- T2 (S3, S4) Gold con la TRM: dim_fecha, hecho diario de TRM, pruebas relationships (HU-09 parte A, HU-10). [x] PR #9
+- T3 (S6) Pipeline de un comando en Docker: `pipeline.py`, `verificar.py`, servicio `pipeline` (HU-12). [x] PR #12
+- T4 (S2) IPC y tasa en silver (HU-08). [x] PR #14, con los CSV reales de `data/fuentes/`
+- T5 (S3, S4) Hecho mensual y mart mensual (HU-09 parte B, HU-10). [x] PR #22
+- T6 (S8) App web Streamlit de consulta y descarga (HU-14). [x] PR #13 y #19
+- T7 (S7) Tablero Metabase creado por script contra su API (HU-13). [x] PR #16 y #18
+- T8 (S5) Linaje: descripciones de columnas y dbt docs (HU-11). [x] PR #17
+- T9 (S9) Documentos T-02 a T-08, trazabilidad y README para HU-02. [x] PR #11, #20 y #21; README con «Inicio rápido» el 30 oct. Falta la corrida de HU-02 en máquina limpia
 
 ## Log
 - L1: "sigue con todo el proceso y tareas para llevar a cabo el proyecto"
 - L2: CSV del Banco: "Los descargo yo y los dejo en data/fuentes/ (Recomendada)". HU-14: "Streamlit (Recomendada)". PR: "Apilados; activo borrar rama al mergear (Recomendada)".
+- L3 (30 oct 2026): todas las tareas T1–T9 están en `main`; se marcan con su PR.
+
