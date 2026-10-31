@@ -1,7 +1,7 @@
 # Matriz de trazabilidad v2 (T-05, T-09)
 
-Estado al 30 oct 2026, sobre `main` (commit `3b31b45`). "Hecho" significa implementado,
-mergeado y verificado en `main`; "Pendiente" es lo que falta para la entrega final.
+Estado al 30 oct 2026. "Hecho" significa implementado,
+mergeado y verificado en `main`.
 La evidencia de las corridas está en `docs/evidencia/ejecucion-2026-10-30.md`.
 
 | Requisito | HU | Casos de uso | Caso de prueba | Implementación | Estado |
@@ -14,19 +14,19 @@ La evidencia de las corridas está en `docs/evidencia/ejecucion-2026-10-30.md`.
 | RF-05 | HU-07, 08, 10 | CU-04 | CP-SIL-01, CP-GLD-01 | tests en `*.yml` de dbt | Hecho |
 | RF-06 | HU-11 | CU-07 | Aceptación de HU-11 | `dbt docs` | Hecho (PR #17) |
 | RF-07 | HU-13 | CU-05 | CP-DASH-01 | Metabase | Hecho y verificado por API (PR #16, #18) |
-| RF-08 | HU-12, 02 | CU-02, CU-08 | CP-E2E-01 | `pipeline.py`, `verificar.py` | HU-12 hecho y verificado; HU-02 pendiente |
+| RF-08 | HU-12, 02 | CU-02, CU-08 | CP-E2E-01 | `pipeline.py`, `verificar.py` | Hecho y verificado (HU-12 y HU-02) |
 | RF-09 | HU-14 | CU-06 | CP-APP-01 | `app/` | Hecho (PR #13, #19) |
-| RNF-01 | HU-01, 02 | CU-01, CU-08 | CP-INST-01 | `docker-compose.yml`, `Dockerfile` | HU-01 hecho; HU-02 pendiente |
+| RNF-01 | HU-01, 02 | CU-01, CU-08 | CP-INST-01 | `docker-compose.yml`, `Dockerfile` | Hecho y verificado en clon limpio (HU-01 y HU-02) |
 | RNF-02 | HU-12 | CU-02 | CP-E2E-01 | `pipeline.py` | Medido: 12.0 s (umbral < 5 min) |
 | RNF-03 | Todas | — | `verificar.py` | ruff | Hecho |
 | RNF-04 | Todas | — | Historial de Git | PRs enlazados a HU | Hecho |
 | RNF-05 | HU-11 | CU-07 | Aceptación de HU-11 | `dbt docs` | Hecho (PR #17) |
 
-## Lo que falta
+## Cierre
 
-- **HU-02 / CP-INST-01:** instalar y ejecutar en una máquina limpia siguiendo solo el README.
-  Los pasos de instalación están ahora en la sección «Inicio rápido» del `README.md`.
-- **T-09:** actas de sprint y retrospectiva (no se redactan con datos inventados).
-- **CP-GLD-02:** falta un test que fije la fecha mínima `2020-01` del mart.
+- **HU-02 / CP-INST-01:** pasa en clon limpio (`docs/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`).
+  La corrida encontró que el tablero fallaba por falta de healthcheck en Metabase; corregido.
+- **T-09:** actas de sprint y retrospectiva en `docs/actas-retrospectiva.md`; las opiniones del equipo quedan «A confirmar».
+- **CP-GLD-02:** fijado con `dbt/tests/mart_mensual_empieza_en_2020_01.sql`.
 
-Todas las HU restantes (HU-01 y HU-03 a HU-14) están en `main`.
+Todas las HU (HU-01 a HU-14) están en `main`.
