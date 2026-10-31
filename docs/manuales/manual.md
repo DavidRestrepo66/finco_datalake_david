@@ -24,7 +24,7 @@ docker compose --profile app up app       # app web: http://localhost:8501
 ## Manual técnico
 
 ### Arquitectura
-Ver `docs/arquitectura.md` (lakehouse híbrido: bronze en Parquet y PostgreSQL; silver y gold con dbt) y `docs/modelo-datos.md`.
+Ver `docs/diseno/arquitectura.md` (lakehouse híbrido: bronze en Parquet y PostgreSQL; silver y gold con dbt) y `docs/diseno/modelo-datos.md`.
 
 ### Estructura
 | Ruta | Contenido |

@@ -1,5 +1,5 @@
 # MVP data warehouse finco (HU-01, 03, 04, 05)
-Orden fijado por el PO: Docker, luego ingesta. Fuente: `06-product-backlog.md`.
+Orden fijado por el PO: Docker, luego ingesta. Fuente: `entregables/entregable-1/06-product-backlog.md`.
 
 ## Specs
 - S1: HU-01 "Cuando ejecuto `docker compose up -d` Entonces PostgreSQL acepta conexiones con los esquemas bronze, silver y gold creados Y Metabase responde en el puerto configurado".

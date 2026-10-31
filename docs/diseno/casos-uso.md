@@ -1,6 +1,6 @@
 # Casos de uso y flujos (T-02)
 
-Fuente: `06-product-backlog.md` (actores y HU) y `05-requisitos.md` (RF/RNF).
+Fuente: `entregables/entregable-1/06-product-backlog.md` (actores y HU) y `entregables/entregable-1/05-requisitos.md` (RF/RNF).
 
 ## 1. Diagrama de casos de uso
 

@@ -2,7 +2,7 @@
 
 Estado al 30 oct 2026. "Hecho" significa implementado,
 mergeado y verificado en `main`.
-La evidencia de las corridas está en `docs/evidencia/ejecucion-2026-10-30.md`.
+La evidencia de las corridas está en `docs/pruebas/evidencia/ejecucion-2026-10-30.md`.
 
 | Requisito | HU | Casos de uso | Caso de prueba | Implementación | Estado |
 |---|---|---|---|---|---|
@@ -24,9 +24,9 @@ La evidencia de las corridas está en `docs/evidencia/ejecucion-2026-10-30.md`.
 
 ## Cierre
 
-- **HU-02 / CP-INST-01:** pasa en clon limpio (`docs/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`).
+- **HU-02 / CP-INST-01:** pasa en clon limpio (`docs/pruebas/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`).
   La corrida encontró que el tablero fallaba por falta de healthcheck en Metabase; corregido.
-- **T-09:** actas de sprint y retrospectiva en `docs/actas-retrospectiva.md`; las opiniones del equipo quedan «A confirmar».
+- **T-09:** actas de sprint y retrospectiva en `docs/gestion/actas-retrospectiva.md`; las opiniones del equipo quedan «A confirmar».
 - **CP-GLD-02:** fijado con `dbt/tests/mart_mensual_empieza_en_2020_01.sql`.
 
 Todas las HU (HU-01 a HU-14) están en `main`.

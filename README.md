@@ -30,8 +30,8 @@ Cuando el pipeline imprime `Pipeline completo en …`, los datos están cargados
 
 Los puertos y las credenciales se toman de `.env` (copiado de `.env.example`). La primera
 ejecución descarga las imágenes de Docker y consulta la API de Socrata para la TRM, así que
-necesita conexión a internet. El detalle de cada componente está en `docs/manual.md` y una
-corrida de referencia en `docs/evidencia/ejecucion-2026-10-30.md`.
+necesita conexión a internet. El detalle de cada componente está en `docs/manuales/manual.md` y una
+corrida de referencia en `docs/pruebas/evidencia/ejecucion-2026-10-30.md`.
 
 ---
 

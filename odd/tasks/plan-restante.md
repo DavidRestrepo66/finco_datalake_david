@@ -1,5 +1,5 @@
 # Plan restante hasta la entrega final (20 nov)
-Fuentes: `02-planeacion-cronograma.md` (Gantt) y `06-product-backlog.md` (criterios). Complementa `mvp-datawarehouse.md`.
+Fuentes: `entregables/entregable-1/02-planeacion-cronograma.md` (Gantt) y `entregables/entregable-1/06-product-backlog.md` (criterios). Complementa `mvp-datawarehouse.md`.
 Estado al 2026-10-30: todas las HU de HU-01 y HU-03 a HU-14 están en `main` (PRs #1 a #22). Solo queda HU-02 y el cierre documental.
 
 ## Specs
@@ -16,25 +16,25 @@ Estado al 2026-10-30: todas las HU de HU-01 y HU-03 a HU-14 están en `main` (PR
 ## Tasks (ID, specs, responsable, fecha Gantt)
 ### Sprint 2 (hasta 1 nov)
 - T1 (S1) Versionar CSV reales de IPC y tasa en `data/fuentes/` y cargarlos. David, 30 oct–1 nov. [x] `data/fuentes/ipc.csv` y `tasa_intervencion.csv` versionados (PR #10).
-- T2 (S9) T-02 Casos de uso y flujos (`docs/casos-uso.md`). David, hasta 8 nov. [x] commit docs: casos de uso y flujos.
-- T3 (S9) T-03 Diagrama de arquitectura. Andrey, 29 oct–1 nov. [x] `docs/arquitectura.md`.
-- T4 (S9) T-04 ER de 3 capas y ADR Opción B. Juan, 26 oct–1 nov. [x] `docs/modelo-datos.md`.
+- T2 (S9) T-02 Casos de uso y flujos (`docs/diseno/casos-uso.md`). David, hasta 8 nov. [x] commit docs: casos de uso y flujos.
+- T3 (S9) T-03 Diagrama de arquitectura. Andrey, 29 oct–1 nov. [x] `docs/diseno/arquitectura.md`.
+- T4 (S9) T-04 ER de 3 capas y ADR Opción B. Juan, 26 oct–1 nov. [x] `docs/diseno/modelo-datos.md`.
 ### Sprint 3 (2–8 nov)
 - T5 (S2) HU-08 Silver de IPC y tasa por vigencia. Juan, 3–6 nov. [x] PR #14.
 - T6 (S3) HU-09 Hecho mensual y mart mensual. Juan, 4–8 nov. [x] PR #22.
 - T7 (S4) HU-12 Pipeline con IPC y tasa. Andrey, 4–8 nov. [x] PR #12; verificado en Docker el 30 oct (12.0 s).
 - T8 (S5) HU-06 Reintentos y log de errores en TRM. David, 2–4 nov. [x] PR #8.
-- T9 (S9) T-06 Plan de pruebas y casos. Juan, 2–6 nov. [x] `docs/plan-pruebas.md`.
-- T10 (S9) T-05 Matriz de trazabilidad v1 (`docs/trazabilidad.md`). Andrey, 5–8 nov. [x] v2 al 30 oct.
+- T9 (S9) T-06 Plan de pruebas y casos. Juan, 2–6 nov. [x] `docs/pruebas/plan-pruebas.md`.
+- T10 (S9) T-05 Matriz de trazabilidad v1 (`docs/gestion/trazabilidad.md`). Andrey, 5–8 nov. [x] v2 al 30 oct.
 ### Sprint 4 (9–15 nov)
 - T11 (S7) HU-13 Tablero Metabase por script. Andrey, 9–13 nov. [x] PR #16 y #18; verificado por API el 30 oct.
 - T12 (S6) HU-11 Linaje con dbt docs. Juan, 9–11 nov. [x] PR #17.
-- T13 (S9) T-07 Ejecución de pruebas y evidencia. Juan, 10–15 nov. [x] `docs/evidencia/ejecucion-2026-10-29.md` y `-10-30.md`.
-- T14 (S9) T-08 Manual técnico y de usuario. Andrey, 11–15 nov. [x] `docs/manual.md` (PR #21).
+- T13 (S9) T-07 Ejecución de pruebas y evidencia. Juan, 10–15 nov. [x] `docs/pruebas/evidencia/ejecucion-2026-10-29.md` y `-10-30.md`.
+- T14 (S9) T-08 Manual técnico y de usuario. Andrey, 11–15 nov. [x] `docs/manuales/manual.md` (PR #21).
 - T15 HU-14 Actualizar la app para leer el mart mensual. David. [x] PR #13 y #19.
 ### Cierre (16–20 nov)
-- T16 (S8) HU-02 Instalación en máquina limpia con solo el README. Andrey, 16–18 nov. [x] corrida en clon limpio el 30 oct: pasa; evidencia en `docs/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`.
-- T17 (S9) T-09 Trazabilidad final, actas, retrospectiva. Andrey/todos, 16–19 nov. [x] `docs/trazabilidad.md` y `docs/actas-retrospectiva.md`; solo falta que el equipo complete lo marcado «A confirmar».
+- T16 (S8) HU-02 Instalación en máquina limpia con solo el README. Andrey, 16–18 nov. [x] corrida en clon limpio el 30 oct: pasa; evidencia en `docs/pruebas/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`.
+- T17 (S9) T-09 Trazabilidad final, actas, retrospectiva. Andrey/todos, 16–19 nov. [x] `docs/gestion/trazabilidad.md` y `docs/gestion/actas-retrospectiva.md`; solo falta que el equipo complete lo marcado «A confirmar».
 - T18 Ensayo de demo. Todos, 18–19 nov. [ ]
 
 ## Log

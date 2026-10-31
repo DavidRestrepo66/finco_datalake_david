@@ -15,7 +15,7 @@ Las pruebas se ejecutan en local antes de cada PR con `python verificar.py` (ruf
 | CP-GLD-02 | Mart mensual con una fila por mes desde 2020 | HU-09 | Calidad dbt | `dbt build` (`unique` y `not_null` sobre `anio_mes`) | Automatizada, incluido `dbt/tests/mart_mensual_empieza_en_2020_01.sql` |
 | CP-E2E-01 | Pipeline completo termina con código 0 | HU-12 | Integración | `docker compose run --rm pipeline` | Ejecutada en Docker: código 0, `PASS=42 ERROR=0`, 12.0 s |
 | CP-DASH-01 | Tablero muestra 3 visualizaciones con datos | HU-13 | Aceptación | Manual en Metabase | Verificada por API: 3 tarjetas, 81 filas cada una, filtro `Fechas` |
-| CP-INST-01 | Instalación en máquina limpia siguiendo el README | HU-02 | Instalación | Manual | Ejecutada el 30 oct en clon limpio: pasa (`docs/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`) |
+| CP-INST-01 | Instalación en máquina limpia siguiendo el README | HU-02 | Instalación | Manual | Ejecutada el 30 oct en clon limpio: pasa (`docs/pruebas/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`) |
 | CP-APP-01 | La app descarga el CSV filtrado y avisa si no hay datos | HU-14 | Unitaria | `pytest app` | Automatizada; la interfaz responde en `:8501` |
 
 CP-APP-01 es un caso agregado en este plan; no estaba en el README.
@@ -27,10 +27,10 @@ CP-APP-01 es un caso agregado en este plan; no estaba en el README.
 
 ## Evidencia (T-07)
 
-Cada ejecución pega en el PR la salida de `verificar.py`. Los casos manuales guardan captura o registro en `docs/evidencia/`.
+Cada ejecución pega en el PR la salida de `verificar.py`. Los casos manuales guardan captura o registro en `docs/pruebas/evidencia/`.
 
 Corridas registradas:
 
-- `docs/evidencia/ejecucion-2026-10-29.md` — por rama, antes del merge.
-- `docs/evidencia/ejecucion-2026-10-30-instalacion-limpia.md` — instalación en clon limpio (HU-02).
-- `docs/evidencia/ejecucion-2026-10-30.md` — sobre `main`: pipeline en Docker, datos cargados, tablero por API y app.
+- `docs/pruebas/evidencia/ejecucion-2026-10-29.md` — por rama, antes del merge.
+- `docs/pruebas/evidencia/ejecucion-2026-10-30-instalacion-limpia.md` — instalación en clon limpio (HU-02).
+- `docs/pruebas/evidencia/ejecucion-2026-10-30.md` — sobre `main`: pipeline en Docker, datos cargados, tablero por API y app.

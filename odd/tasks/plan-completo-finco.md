@@ -1,9 +1,9 @@
 # Plan completo finco: del MVP al cierre (HU-06 a HU-14, HU-02 y documentos)
-Continúa `mvp-datawarehouse.md` (HU-01, 03, 04, 05 y HU-07 ya entregadas). Fuente: `06-product-backlog.md`.
+Continúa `mvp-datawarehouse.md` (HU-01, 03, 04, 05 y HU-07 ya entregadas). Fuente: `entregables/entregable-1/06-product-backlog.md`.
 Cadena de PR apilados a main; cada PR ≤ 400 líneas; el PO mergea en orden.
 
 ## Specs
-- S1: HU-06 "Reintentos y registro de errores en la TRM" (`06-product-backlog.md`, escenarios de la HU-06).
+- S1: HU-06 "Reintentos y registro de errores en la TRM" (`entregables/entregable-1/06-product-backlog.md`, escenarios de la HU-06).
 - S2: HU-08 "Dado que bronze contiene los cambios de tasa con su fecha de decisión Cuando ejecuto "dbt build" sobre silver Entonces cada registro tiene fecha_inicio y fecha_fin de vigencia Y los periodos de vigencia no se solapan". IPC por mes.
 - S3: HU-09 "Entonces existe una dimensión de fecha, un hecho diario de TRM y un hecho mensual de indicadores Y el mart mensual tiene una fila por mes con TRM promedio, IPC y tasa vigente".
 - S4: HU-10 "Entonces el test relationships entre cada hecho y la dimensión de fecha pasa" y "Entonces el test relationships falla e identifica el registro huérfano".
