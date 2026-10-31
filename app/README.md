@@ -1,6 +1,9 @@
 # App de consulta (HU-14)
 
-`streamlit run app/app.py` (o `docker compose up app`).
+`python -m streamlit run app/ui.py` (o `docker compose --profile app up app`).
+
+El `python -m` es necesario: Streamlit agrega la carpeta del script al frente de `sys.path`, y sin la
+raíz del proyecto en el path el paquete `app` no se resuelve.
 
 Conjuntos disponibles:
 

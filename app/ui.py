@@ -4,7 +4,11 @@ Conjuntos: TRM diaria (gold.fact_trm_diaria) y mart mensual (gold.mart_mensual: 
 ipc, inflacion_anual, tasa_vigente). En el mart mensual el rango filtra por `anio_mes` (primer día de cada mes).
 Un rango sin datos muestra un mensaje y no ofrece descarga.
 
-Uso: streamlit run app/app.py   (o `docker compose up app`)
+Uso: python -m streamlit run app/ui.py   (o `docker compose --profile app up app`)
+
+El archivo no se llama `app.py` a propósito: Streamlit pone la carpeta del script al
+frente de `sys.path`, y un `app.py` dentro del paquete `app` haría que `from app import
+consulta` resuelva al propio script en vez de al paquete.
 """
 
 import datetime as dt
