@@ -33,8 +33,8 @@ Estado al 2026-10-30: todas las HU de HU-01 y HU-03 a HU-14 están en `main` (PR
 - T14 (S9) T-08 Manual técnico y de usuario. Andrey, 11–15 nov. [x] `docs/manual.md` (PR #21).
 - T15 HU-14 Actualizar la app para leer el mart mensual. David. [x] PR #13 y #19.
 ### Cierre (16–20 nov)
-- T16 (S8) HU-02 Instalación en máquina limpia con solo el README. Andrey, 16–18 nov. [ ] los pasos ya están en la sección «Inicio rápido» del README; falta la corrida en máquina limpia.
-- T17 (S9) T-09 Trazabilidad final, actas, retrospectiva. Andrey/todos, 16–19 nov. [ ] trazabilidad v2 hecha; faltan actas de sprint y retrospectiva.
+- T16 (S8) HU-02 Instalación en máquina limpia con solo el README. Andrey, 16–18 nov. [x] corrida en clon limpio el 30 oct: pasa; evidencia en `docs/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`.
+- T17 (S9) T-09 Trazabilidad final, actas, retrospectiva. Andrey/todos, 16–19 nov. [x] `docs/trazabilidad.md` y `docs/actas-retrospectiva.md`; solo falta que el equipo complete lo marcado «A confirmar».
 - T18 Ensayo de demo. Todos, 18–19 nov. [ ]
 
 ## Log

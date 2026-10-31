@@ -511,20 +511,20 @@ Cada ejecución se registra en `docs/pruebas/evidencia/` con fecha, quién la ej
 
 | Requisito | Descripción breve | HU | Caso de uso | Código (PR) | Prueba | Estado |
 |---|---|---|---|---|---|---|
-| RF-01 | Extraer TRM, IPC y tasa | HU-03, 04, 05, 06 | CU-02 | | CP-ING-01, 02 | Pendiente |
-| RF-01b | Conciliar periodicidades (Opción B) | HU-08, 09 | — | | CP-SIL-02, CP-GLD-02 | Pendiente |
-| RF-02 | Conservar crudos con metadatos | HU-03, 04, 05 | CU-02 | | CP-ING-03 | Pendiente |
-| RF-03 | Limpiar, tipar y deduplicar | HU-07, 08 | — | | CP-SIL-01 | Pendiente |
-| RF-04 | Esquema estrella en gold | HU-09 | — | | CP-GLD-02 | Pendiente |
-| RF-05 | Pruebas automáticas de calidad | HU-07, 08, 10 | CU-03 | | CP-SIL-01, CP-GLD-01 | Pendiente |
-| RF-06 | Consultar linaje | HU-11 | CU-05 | | Aceptación HU-11 | Pendiente |
-| RF-07 | Tablero con 3+ visualizaciones | HU-13 | CU-04 | | CP-DASH-01 | Pendiente |
-| RF-08 | Ejecución con un solo comando | HU-12, 02 | CU-01 | | CP-E2E-01 | Pendiente |
-| RNF-01 | Entorno con Docker Compose | HU-01, 02 | CU-01 | | CP-INST-01 | Pendiente |
-| RNF-02 | Pipeline en menos de X minutos | HU-12 | CU-01 | | Medición de rendimiento | Pendiente (umbral por definir) |
-| RNF-03 | Estándar de estilo | Todas | — | | `verificar.py` | Pendiente |
-| RNF-04 | Transformaciones versionadas | Todas | — | Historial Git | — | Pendiente |
-| RNF-05 | Documentación dbt automática | HU-11 | CU-05 | | Aceptación HU-11 | Pendiente |
+| RF-01 | Extraer TRM, IPC y tasa | HU-03, 04, 05, 06 | CU-02 | PR #3, #8, #10 | CP-ING-01, 02 | Hecho |
+| RF-01b | Conciliar periodicidades (Opción B) | HU-08, 09 | — | PR #14, #22 | CP-SIL-02, CP-GLD-02 | Hecho |
+| RF-02 | Conservar crudos con metadatos | HU-03, 04, 05 | CU-02 | PR #3 | CP-ING-03 | Hecho |
+| RF-03 | Limpiar, tipar y deduplicar | HU-07, 08 | — | PR #7, #14 | CP-SIL-01 | Hecho |
+| RF-04 | Esquema estrella en gold | HU-09 | — | PR #9, #22 | CP-GLD-02 | Hecho |
+| RF-05 | Pruebas automáticas de calidad | HU-07, 08, 10 | CU-03 | PR #7, #14, #22 | CP-SIL-01, CP-GLD-01 | Hecho |
+| RF-06 | Consultar linaje | HU-11 | CU-05 | PR #17 | Aceptación HU-11 | Hecho |
+| RF-07 | Tablero con 3+ visualizaciones | HU-13 | CU-04 | PR #16, #18 | CP-DASH-01 | Hecho, verificado por API |
+| RF-08 | Ejecución con un solo comando | HU-12, 02 | CU-01 | PR #12 | CP-E2E-01 | Hecho, verificado en Docker y en clon limpio |
+| RNF-01 | Entorno con Docker Compose | HU-01, 02 | CU-01 | PR #1 | CP-INST-01 | Hecho, verificado en clon limpio |
+| RNF-02 | Pipeline en menos de X minutos | HU-12 | CU-01 | PR #12 | Medición de rendimiento | Medido: 12.0 s (umbral < 5 min) |
+| RNF-03 | Estándar de estilo | Todas | — | `verificar.py` | `verificar.py` | Hecho |
+| RNF-04 | Transformaciones versionadas | Todas | — | Historial Git | — | Hecho |
+| RNF-05 | Documentación dbt automática | HU-11 | CU-05 | PR #17 | Aceptación HU-11 | Hecho |
 
 ---
 
