@@ -23,7 +23,7 @@ erDiagram
     FACT_INDICADORES_MENSUAL ||--|| MART_MENSUAL : anio_mes
 ```
 
-Vigentes hoy: `bronze.*_raw`, `silver.trm`, `gold.dim_fecha`, `gold.fact_trm_diaria`. El resto es diseño para HU-08 y HU-09; los nombres de columnas se confirman al implementarlos.
+Todas las tablas del diagrama están implementadas (`bronze`, `silver` y `gold`, ver `dbt/models/`). Las columnas del diagrama son ilustrativas; las definitivas están en los `.yml` de dbt.
 
 ## 2. ADR-01 Periodicidad mixta: Opción B (D-03)
 

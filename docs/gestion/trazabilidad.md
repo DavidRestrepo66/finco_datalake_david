@@ -30,3 +30,9 @@ La evidencia de las corridas está en `docs/pruebas/evidencia/ejecucion-2026-10-
 - **CP-GLD-02:** fijado con `dbt/tests/mart_mensual_empieza_en_2020_01.sql`.
 
 Todas las HU (HU-01 a HU-14) están en `main`.
+
+## Diagramas del Entregable 2
+
+El detalle de cada caso de uso con sus diagramas, HU y pruebas está en
+`entregables/entregable-2/00-indice.md`. Casos de prueba agregados: CP-PIPE-01, CP-DASH-02, CP-LIN-01 y CP-CAL-01
+(ver `docs/pruebas/plan-pruebas.md`).
