@@ -47,3 +47,12 @@ def test_el_script_se_ejecuta_sin_excepciones():
 
     assert not at.exception, [str(e.value) for e in at.exception]
     assert len(at.selectbox) == 1
+
+
+def test_la_app_ofrece_la_pestana_de_analisis_con_indicadores():
+    at = AppTest.from_file(str(RUTA))
+    at.run()
+
+    assert not at.exception, [str(e.value) for e in at.exception]
+    assert [t.label for t in at.tabs] == ["Consulta y descarga", "Análisis"]
+    assert len(at.metric) == 4
