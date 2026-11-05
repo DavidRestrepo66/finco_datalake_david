@@ -17,8 +17,12 @@ docker compose --profile app up app       # app web: http://localhost:8501
 - **Tablero (Metabase):** http://localhost:3000, tablero «Tablero macroeconómico» con filtro de fechas.
   Se crea automáticamente al final del pipeline (`metabase/tablero.py`, con `METABASE_ADMIN_EMAIL` y
   `METABASE_ADMIN_PASSWORD` de `.env`); si ya existe, no lo duplica.
-- **App web (Streamlit):** elegir conjunto (TRM diaria o mart mensual), rango de fechas, ver la vista previa y descargar el CSV.
-  Si el rango no tiene datos, muestra un mensaje y no genera archivo.
+- **App web (Streamlit):** el rango de fechas se elige arriba y aplica a dos pestañas.
+  - *Consulta y descarga:* elegir conjunto (TRM diaria o mart mensual), ver la vista previa y descargar el CSV.
+    Si el rango no tiene datos, muestra un mensaje y no genera archivo.
+  - *Análisis:* sobre el mart mensual del rango, muestra variación de la TRM, inflación promedio, tasa vigente y
+    tasa real (tasa − inflación), gráficos de la TRM y de inflación frente a tasa, y una lectura en texto
+    generada desde los datos (máximo/mínimo de la TRM, correlación TRM–inflación). La correlación no implica causalidad.
 - **Linaje:** `cd dbt && dbt docs generate --profiles-dir . && dbt docs serve --profiles-dir .`
 
 ### Solución de problemas
