@@ -21,6 +21,16 @@ docker compose --profile app up app       # app web: http://localhost:8501
   Si el rango no tiene datos, muestra un mensaje y no genera archivo.
 - **Linaje:** `cd dbt && dbt docs generate --profiles-dir . && dbt docs serve --profiles-dir .`
 
+### Solución de problemas
+- **La app no abre (`localhost:8501` no responde) y `docker compose logs app` muestra `File does not exist: app/ui.py`.**
+  La imagen de Docker quedó desactualizada respecto al código (se construyó antes de que el entrypoint se
+  renombrara a `ui.py`). Reconstruirla y volver a levantar la app:
+  ```sh
+  docker compose --profile app build app
+  docker compose --profile app up -d app
+  ```
+  Conviene hacerlo después de cada `git pull` que cambie código en `app/`.
+
 ## Manual técnico
 
 ### Arquitectura
