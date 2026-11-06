@@ -36,14 +36,14 @@ def _pedir_pagina(sesion, params, espera):
             espera(pausa)
 
 
-def extraer_trm(sesion=None, tam_pagina=TAM_PAGINA, espera=time.sleep):
-    """Devuelve todas las filas de la TRM desde FECHA_INICIO, tal como las entrega la fuente."""
+def extraer_trm(sesion=None, tam_pagina=TAM_PAGINA, espera=time.sleep, desde=FECHA_INICIO):
+    """Devuelve las filas de la TRM con vigenciadesde >= `desde` (por defecto FECHA_INICIO), tal como las entrega la fuente."""
     sesion = sesion or requests.Session()
     filas = []
     offset = 0
     while True:
         params = {
-            "$where": f"vigenciadesde >= '{FECHA_INICIO}T00:00:00'",
+            "$where": f"vigenciadesde >= '{desde}T00:00:00'",
             "$order": "vigenciadesde",
             "$limit": tam_pagina,
             "$offset": offset,
