@@ -97,3 +97,14 @@ def test_ultima_vigencia_es_la_mayor_vigenciadesde_cargada(conn):
 
     cargar_trm(conn, [{"valor": "1", "vigenciadesde": "2099-05-04T00:00:00.000", "vigenciahasta": "2099-05-04T00:00:00.000"}])
     assert ultima_vigencia(conn) == dt.date(2099, 5, 4)
+
+
+def test_fuente_api_en_bronze_guarda_la_fila_completa_con_lote_y_fuente(conn):
+    from ingesta.carga_bronze import cargar_api
+
+    filas = [{"observation_date": "2020-01-01", "FEDFUNDS": "1.55"}]
+    lote = cargar_api(conn, "fed", filas, "fred.stlouisfed.org/FEDFUNDS")
+    fila = conn.execute(
+        "select fuente, lote_id, fila from bronze.fed_raw where lote_id = %s", (lote,)
+    ).fetchone()
+    assert fila == ("fred.stlouisfed.org/FEDFUNDS", lote, filas[0])

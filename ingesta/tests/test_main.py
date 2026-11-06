@@ -1,6 +1,6 @@
 from ingesta.carga_bronze import main
 
-USO = "uso: python -m ingesta.carga_bronze trm [--completo] | ipc [ruta.csv] | tasa [ruta.csv]\n"
+USO = "uso: python -m ingesta.carga_bronze trm [--completo] | ipc [ruta.csv] | tasa [ruta.csv] | usura | brent | fed | cdt\n"
 
 
 def test_argumentos_invalidos_muestran_el_uso(capsys):
@@ -68,3 +68,33 @@ def test_trm_completo_ignora_lo_cargado_y_pide_todo(tmp_path, monkeypatch):
     pedidos = _trm_con_captura(monkeypatch, tmp_path, "2026-10-16")
     assert main(["trm", "--completo"]) == 0
     assert pedidos == ["2020-01-01"]
+
+
+def test_fuentes_api_conocidas_se_cargan_con_extractor_y_nombre_de_fuente(tmp_path, monkeypatch, capsys):
+    from ingesta import carga_bronze
+
+    cargadas = []
+    monkeypatch.setattr(carga_bronze, "RAIZ_LAKE", tmp_path)
+    monkeypatch.setattr(carga_bronze, "conectar", lambda: _FalsaConexion())
+    monkeypatch.setattr(carga_bronze, "crear_tablas", lambda c: None)
+    monkeypatch.setattr(carga_bronze, "cargar_api", lambda c, nombre, filas, fuente, lote, ahora: cargadas.append((nombre, filas, fuente)))
+    monkeypatch.setitem(carga_bronze.FUENTES_API, "fed", ("fred/FEDFUNDS", lambda conn: [{"x": "1"}]))
+    assert main(["fed"]) == 0
+    assert cargadas == [("fed", [{"x": "1"}], "fred/FEDFUNDS")]
+    assert "fed: 1 registros" in capsys.readouterr().out
+
+
+def test_fuente_api_que_falla_termina_con_error_sin_crear_lote(tmp_path, monkeypatch, capsys):
+    from ingesta import carga_bronze
+    from ingesta.extractores.fred import ExtraccionError
+
+    def falla(conn):
+        raise ExtraccionError("sin red")
+
+    monkeypatch.setattr(carga_bronze, "RAIZ_LAKE", tmp_path)
+    monkeypatch.setattr(carga_bronze, "conectar", lambda: _FalsaConexion())
+    monkeypatch.setattr(carga_bronze, "crear_tablas", lambda c: None)
+    monkeypatch.setitem(carga_bronze.FUENTES_API, "fed", ("fred/FEDFUNDS", falla))
+    assert main(["fed"]) == 1
+    assert capsys.readouterr().err == "error: sin red\n"
+    assert list(tmp_path.iterdir()) == []

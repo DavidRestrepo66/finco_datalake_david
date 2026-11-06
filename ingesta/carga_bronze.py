@@ -38,12 +38,40 @@ CONJUNTOS_CSV = {
     "ipc": (FUENTE_IPC, RAIZ_FUENTES / "ipc.csv"),
     "tasa_intervencion": (FUENTE_TASA, RAIZ_FUENTES / "tasa_intervencion.csv"),
 }
-USO = "uso: python -m ingesta.carga_bronze trm [--completo] | ipc [ruta.csv] | tasa [ruta.csv]"
+USO = "uso: python -m ingesta.carga_bronze trm [--completo] | ipc [ruta.csv] | tasa [ruta.csv] | usura | brent | fed | cdt"
 
 
 # La TRM se pide desde (última vigencia cargada − margen): el solape recoge correcciones recientes de la
 # fuente y es inocuo porque silver deja, por día, el lote más reciente.
 MARGEN_DIAS = 7
+
+
+def _extraer_usura(conn):
+    from ingesta.extractores.trm_socrata import FECHA_INICIO, extraer_socrata
+
+    return extraer_socrata(
+        "https://www.datos.gov.co/resource/pare-7x5i.json",
+        f"vigencia_hasta >= '{FECHA_INICIO}T00:00:00'",
+        "vigencia_desde, modalidad",
+    )
+
+
+def _extraer_fred(serie):
+    def extraer(conn):
+        from ingesta.extractores.fred import extraer_fred
+        from ingesta.extractores.trm_socrata import FECHA_INICIO
+
+        return extraer_fred(serie, FECHA_INICIO)
+
+    return extraer
+
+
+# nombre -> (fuente, extractor(conn) -> filas crudas). Cada uno se carga como lote nuevo en bronze.<nombre>_raw.
+FUENTES_API = {
+    "usura": ("datos.gov.co/pare-7x5i", _extraer_usura),
+    "brent": ("fred.stlouisfed.org/DCOILBRENTEU", _extraer_fred("DCOILBRENTEU")),
+    "fed": ("fred.stlouisfed.org/FEDFUNDS", _extraer_fred("FEDFUNDS")),
+}
 
 
 def conectar():
@@ -71,6 +99,8 @@ def crear_tablas(conn):
         )
         """
     )
+    for nombre in FUENTES_API:
+        crear_tabla_api(conn, nombre)
     for conjunto in CONJUNTOS_CSV:
         conn.execute(
             sql.SQL(
@@ -88,6 +118,22 @@ def crear_tablas(conn):
                 """
             ).format(sql.Identifier(f"{conjunto}_raw"))
         )
+
+
+def crear_tabla_api(conn, nombre):
+    conn.execute(
+        sql.SQL(
+            """
+            create table if not exists bronze.{} (
+                id bigserial primary key,
+                lote_id uuid not null,
+                fuente text not null,
+                cargado_en timestamptz not null default now(),
+                fila jsonb not null
+            )
+            """
+        ).format(sql.Identifier(f"{nombre}_raw"))
+    )
 
 
 def escribir_parquet(nombre, filas, lote_id, fuente, cargado_en, raiz=RAIZ_LAKE, meta=None):
@@ -170,6 +216,41 @@ def desde_trm(completo):
         return desde_incremental(ultima_vigencia(conn))
 
 
+def cargar_api(conn, nombre, filas, fuente, lote_id=None, cargado_en=None):
+    """Inserta las filas crudas (jsonb, texto) en bronze.<nombre>_raw como lote nuevo y devuelve su id."""
+    lote_id = lote_id or uuid.uuid4()
+    cargado_en = cargado_en or datetime.now(UTC)
+    with conn.cursor() as cur:
+        cur.executemany(
+            sql.SQL("insert into bronze.{} (lote_id, fuente, cargado_en, fila) values (%s, %s, %s, %s)").format(
+                sql.Identifier(f"{nombre}_raw")
+            ),
+            [(lote_id, fuente, cargado_en, Jsonb(f)) for f in filas],
+        )
+    return lote_id
+
+
+def main_api(nombre):
+    from ingesta.extractores.fred import ExtraccionError as ErrorFred
+    from ingesta.extractores.trm_socrata import ExtraccionError as ErrorSocrata
+
+    fuente, extraer = FUENTES_API[nombre]
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    with conectar() as conn:
+        crear_tablas(conn)
+        try:
+            filas = extraer(conn)
+        except (ErrorSocrata, ErrorFred) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+        lote = uuid.uuid4()
+        ahora = datetime.now(UTC)
+        ruta = escribir_parquet(nombre, filas, lote, fuente, ahora)
+        cargar_api(conn, nombre, filas, fuente, lote, ahora)
+    print(f"{nombre}: {len(filas)} registros en {ruta} y en bronze.{nombre}_raw, lote {lote}")
+    return 0
+
+
 def main_csv(conjunto, ruta):
     from ingesta.extractores.banrep import leer_csv
 
@@ -199,6 +280,8 @@ def main(argv):
     if len(argv) in (1, 2) and argv[0] in ("ipc", "tasa"):
         conjunto = "ipc" if argv[0] == "ipc" else "tasa_intervencion"
         return main_csv(conjunto, argv[1] if len(argv) == 2 else None)
+    if len(argv) == 1 and argv[0] in FUENTES_API:
+        return main_api(argv[0])
     if argv not in (["trm"], ["trm", "--completo"]):
         print(USO, file=sys.stderr)
         return 2
