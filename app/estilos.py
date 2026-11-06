@@ -1,22 +1,24 @@
 """Estilos y bloques HTML de la app (sin Streamlit): sistema de diseño «Modernist».
 
 `css(tema)` devuelve el `<style>` con los tokens del diseño claro u oscuro (radio 0, reglas de 2px, Archivo,
-acento #ec3013). Los constructores de HTML (`encabezado`, `rejilla_kpi`, `tabla`, ...) escapan con
+acento azul #007b99 y naranja #f39200 de la marca). Los constructores de HTML (`encabezado`, `rejilla_kpi`, `tabla`, ...) escapan con
 `html.escape` todo texto interpolado: el contenido de la base y de los CSV no es confiable.
 """
 
 from html import escape
 
 TEMAS = {
+    # Paleta del Manual de Identidad Visual de la Universidad Católica Luis Amigó:
+    # azul #007b99 (Pantone 3145 C), naranja #f39200 (Pantone 144 C), gris #848585 (Pantone 423 C), fondo blanco.
     "claro": {
-        "bg": "#f3f2f2", "surface": "#eae9e9", "text": "#201e1d", "accent": "#ec3013",
-        "accent_text": "#ae1800", "accent_100": "#fff2ef", "divider": "#9f9d9d",
-        "n200": "#eae7e7", "n500": "#9b9797", "n700": "#605d5d", "n800": "#444141", "hover": "#dfdddd",
+        "bg": "#ffffff", "surface": "#f1f5f6", "text": "#1d2a2e", "accent": "#007b99",
+        "accent_text": "#006178", "accent_100": "#e3f2f6", "secondary": "#f39200", "divider": "#9aa7ab",
+        "n200": "#e6ecee", "n500": "#848585", "n700": "#586062", "n800": "#3d4547", "hover": "#e3eaec",
     },
     "oscuro": {
-        "bg": "#161514", "surface": "#211f1e", "text": "#eceaea", "accent": "#ff563c",
-        "accent_text": "#ff9a88", "accent_100": "#3b1a13", "divider": "#5b5958",
-        "n200": "#2f2c2b", "n500": "#8f8a8a", "n700": "#bab6b6", "n800": "#d7d3d3", "hover": "#2a2827",
+        "bg": "#0f1a1d", "surface": "#16252a", "text": "#e8eff1", "accent": "#2bb5d6",
+        "accent_text": "#7fd3e6", "accent_100": "#0d3340", "secondary": "#f39200", "divider": "#4a5b60",
+        "n200": "#22343a", "n500": "#848585", "n700": "#aab4b6", "n800": "#cfd8da", "hover": "#1c2d32",
     },
 }
 
@@ -24,7 +26,7 @@ PLANTILLA = """<style>
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap');
 :root {
   --bg: %(bg)s; --surface: %(surface)s; --text: %(text)s; --accent: %(accent)s;
-  --accent-text: %(accent_text)s; --accent-100: %(accent_100)s; --divider: %(divider)s;
+  --accent-text: %(accent_text)s; --accent-100: %(accent_100)s; --secondary: %(secondary)s; --divider: %(divider)s;
   --n200: %(n200)s; --n500: %(n500)s; --n700: %(n700)s; --n800: %(n800)s; --hover: %(hover)s;
   --font: "Archivo", system-ui, sans-serif;
 }
@@ -36,6 +38,10 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], 
   font-family: var(--font);
 }
 .stApp, .stApp p, .stApp label, .stApp li { color: var(--text); }
+/* los íconos de Streamlit son ligaduras de una fuente: no se les puede cambiar la tipografía */
+.stApp [data-testid="stIconMaterial"], .stApp .material-icons, .stApp .material-symbols-rounded {
+  font-family: "Material Symbols Rounded", "Material Icons" !important;
+}
 *, *::before, *::after { border-radius: 0 !important; }
 .block-container { max-width: 1240px; padding: 32px clamp(16px, 4vw, 56px) 64px; }
 a { color: var(--accent-text); text-underline-offset: 3px; }
@@ -118,7 +124,7 @@ a:hover { color: var(--accent); }
 .kpi-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--n800); }
 .kpi-swatch { width: 12px; height: 3px; background: var(--n800); display: inline-block; }
 .kpi-swatch.sw-trm { background: var(--accent); }
-.kpi-swatch.sw-inflacion { background: var(--text); }
+.kpi-swatch.sw-inflacion { background: var(--secondary); }
 .kpi-swatch.sw-tasa { background: var(--n500); }
 .kpi-value { font-weight: 800; font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums; }
 .kpi-nota { font-size: 12px; color: var(--n700); }
@@ -137,7 +143,7 @@ pre.codigo { padding: 16px; border: 1px solid var(--divider); line-height: 1.6; 
 .leyenda { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--n700); margin-top: 8px; }
 .leyenda-item { display: flex; align-items: center; gap: 6px; }
 .muestra { width: 14px; height: 10px; border: 1px solid var(--divider); display: inline-block; }
-.muestra.subida { background: var(--accent-100); }
+.muestra.subida { background: color-mix(in srgb, var(--secondary) 22%%, var(--bg)); }
 .muestra.recorte { background: var(--n200); }
 .lectura { border-top: 2px solid var(--text); padding-top: 12px; display: flex; flex-direction: column; gap: 12px; }
 .lectura p { margin: 0; font-size: 16px; line-height: 1.55; max-width: 60ch; }

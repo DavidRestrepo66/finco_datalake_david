@@ -89,7 +89,7 @@ def test_el_tema_oscuro_se_renderiza_sin_excepciones():
     at.sidebar.radio(key="tema").set_value("Oscuro").run()
 
     assert not at.exception, [str(e.value) for e in at.exception]
-    assert any("#161514" in m.value for m in at.markdown)
+    assert any("#0f1a1d" in m.value for m in at.markdown)
 
 
 def test_el_atajo_2023_fija_el_periodo_global():

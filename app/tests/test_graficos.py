@@ -47,10 +47,10 @@ def test_la_tasa_es_un_escalon_con_linea_discontinua():
 def test_colores_fijos_por_serie_y_variante_clara_u_oscura():
     claro = graficos.figura_principal(filas(), BANDAS, tema="claro")
     oscuro = graficos.figura_principal(filas(), BANDAS, tema="oscuro")
-    assert claro.data[0].line.color == "#ec3013"
-    assert oscuro.data[0].line.color == "#ff563c"
-    assert claro.data[1].line.color == "#201e1d" and oscuro.data[1].line.color == "#eceaea"
-    assert claro.layout.paper_bgcolor == "#f3f2f2" and oscuro.layout.paper_bgcolor == "#161514"
+    assert claro.data[0].line.color == "#007b99"
+    assert oscuro.data[0].line.color == "#2bb5d6"
+    assert claro.data[1].line.color == "#f39200" and oscuro.data[1].line.color == "#f39200"
+    assert claro.layout.paper_bgcolor == "#ffffff" and oscuro.layout.paper_bgcolor == "#0f1a1d"
     for fig in (claro, oscuro):
         for t in fig.data:
             assert t.line.color.startswith("#")  # hex, nunca var(--...)
@@ -98,7 +98,7 @@ def test_series_ocultas_no_generan_trazas():
 def test_esquinas_rectas_sin_barra_de_herramientas():
     fig = graficos.figura_principal(filas(), BANDAS)
     assert graficos.CONFIG["displayModeBar"] is False
-    assert fig.layout.hoverlabel.bordercolor == "#201e1d"
+    assert fig.layout.hoverlabel.bordercolor == "#1d2a2e"
 
 
 def test_tasa_real_es_tasa_menos_inflacion_con_bandas():

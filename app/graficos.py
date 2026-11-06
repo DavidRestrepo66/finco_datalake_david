@@ -2,7 +2,7 @@
 
 Funciones puras: reciben filas del mart mensual (anio_mes, trm_promedio, inflacion_anual, tasa_vigente) y las
 bandas de `analisis.bandas_de_tasa`, y devuelven un `go.Figure`. Los colores son hex fijos tomados del sistema
-de diseño «Modernist» (Plotly no resuelve `var(--...)`), en variante clara y oscura. Esquinas rectas, fuente
+de diseño «Modernist» con la paleta del Manual de Identidad Visual de la Universidad Católica Luis Amigó (Plotly no resuelve `var(--...)`), en variante clara y oscura. Esquinas rectas, fuente
 Archivo, tooltip unificado y separadores es-CO (punto de miles, coma decimal).
 """
 
@@ -15,24 +15,26 @@ CONFIG = {"displayModeBar": False, "displaylogo": False}
 
 PALETAS = {
     "claro": {
-        "fondo": "#f3f2f2",
-        "texto": "#201e1d",
-        "acento": "#ec3013",
-        "divisor": "#9f9d9d",
-        "neutro500": "#9b9797",
-        "neutro700": "#605d5d",
-        "banda_subida": "#fff2ef",
-        "banda_recorte": "#eae7e7",
+        "fondo": "#ffffff",
+        "texto": "#1d2a2e",
+        "acento": "#007b99",
+        "secundario": "#f39200",
+        "divisor": "#9aa7ab",
+        "neutro500": "#848585",
+        "neutro700": "#586062",
+        "banda_subida": "#fdecd0",
+        "banda_recorte": "#e6ecee",
     },
     "oscuro": {
-        "fondo": "#161514",
-        "texto": "#eceaea",
-        "acento": "#ff563c",
-        "divisor": "#5b5958",
-        "neutro500": "#8f8a8a",
-        "neutro700": "#bab6b6",
-        "banda_subida": "#3b1a13",
-        "banda_recorte": "#2f2c2b",
+        "fondo": "#0f1a1d",
+        "texto": "#e8eff1",
+        "acento": "#2bb5d6",
+        "secundario": "#f39200",
+        "divisor": "#4a5b60",
+        "neutro500": "#848585",
+        "neutro700": "#aab4b6",
+        "banda_subida": "#3a2a0c",
+        "banda_recorte": "#22343a",
     },
 }
 
@@ -41,7 +43,7 @@ SERIES = [
     {"clave": "trm", "columna": "trm_promedio", "nombre": "TRM promedio", "eje": "y", "color": "acento",
      "dash": "solid", "escalon": False, "ancho": 2.5, "plantilla": "$ %{y:,.2f}"},
     {"clave": "inflacion", "columna": "inflacion_anual", "nombre": "Inflación anual", "eje": "y2",
-     "color": "texto", "dash": "solid", "escalon": False, "ancho": 2, "plantilla": "%{y:,.2f} %"},
+     "color": "secundario", "dash": "solid", "escalon": False, "ancho": 2, "plantilla": "%{y:,.2f} %"},
     {"clave": "tasa", "columna": "tasa_vigente", "nombre": "Tasa de intervención", "eje": "y2",
      "color": "neutro500", "dash": "dash", "escalon": True, "ancho": 2, "plantilla": "%{y:,.2f} %"},
 ]

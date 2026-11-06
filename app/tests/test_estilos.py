@@ -6,7 +6,7 @@ from app import estilos
 def test_css_claro_tiene_tokens_del_diseno_y_reglas_base():
     css = estilos.css("claro")
     assert css.startswith("<style>") and css.rstrip().endswith("</style>")
-    for token in ("#f3f2f2", "#201e1d", "#ec3013", "Archivo", "border-radius: 0", "2px solid"):
+    for token in ("#ffffff", "#1d2a2e", "#007b99", "Archivo", "border-radius: 0", "2px solid"):
         assert token in css
     for clase in (".kpi-grid", ".kicker", ".pagina-h1", ".tabla"):
         assert clase in css
@@ -14,9 +14,9 @@ def test_css_claro_tiene_tokens_del_diseno_y_reglas_base():
 
 def test_css_oscuro_cambia_los_tokens():
     css = estilos.css("oscuro")
-    for token in ("#161514", "#eceaea", "#ff563c"):
+    for token in ("#0f1a1d", "#e8eff1", "#2bb5d6"):
         assert token in css
-    assert "#f3f2f2" not in css
+    assert "#ffffff" not in css
 
 
 def test_css_tema_desconocido_es_error():
@@ -58,3 +58,9 @@ def test_tabla_escapa_celdas_y_encabezados():
 def test_tabla_permite_estado_como_etiqueta_pero_siempre_escapada():
     html = estilos.tabla(["Estado"], [["PASS"]], etiquetas={"Estado"})
     assert 'class="tag' in html and ">PASS<" in html
+
+
+def test_css_conserva_la_fuente_de_los_iconos_de_streamlit():
+    for tema in ("claro", "oscuro"):
+        css = estilos.css(tema)
+        assert 'stIconMaterial"]' in css and "Material Symbols Rounded" in css
