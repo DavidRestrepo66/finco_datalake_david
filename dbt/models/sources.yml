@@ -16,3 +16,5 @@ sources:
         description: Filas del Brent diario (FRED, DCOILBRENTEU), completas en `fila` (jsonb, texto). Un lote por carga.
       - name: fed_raw
         description: Filas de la tasa de fondos federales mensual (FRED, FEDFUNDS), completas en `fila` (jsonb, texto). Un lote por carga.
+      - name: cdt_raw
+        description: Filas de captación de CDT a 90 días (datos.gov.co), completas en `fila` (jsonb, texto). Un lote por carga.

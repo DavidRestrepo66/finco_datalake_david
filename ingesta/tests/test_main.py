@@ -98,3 +98,19 @@ def test_fuente_api_que_falla_termina_con_error_sin_crear_lote(tmp_path, monkeyp
     assert main(["fed"]) == 1
     assert capsys.readouterr().err == "error: sin red\n"
     assert list(tmp_path.iterdir()) == []
+
+
+def test_cdt_pide_solo_el_plazo_a_90_dias_desde_la_ultima_fecha_cargada(monkeypatch):
+    import datetime as dt
+
+    from ingesta import carga_bronze
+    from ingesta.extractores import trm_socrata
+
+    pedidos = []
+    monkeypatch.setattr(trm_socrata, "extraer_socrata", lambda url, where, order, **kw: pedidos.append((url, where, order)) or [])
+    monkeypatch.setattr(carga_bronze, "ultima_fecha_cdt", lambda conn: dt.date(2026, 11, 3))
+    assert carga_bronze.FUENTES_API["cdt"][1](None) == []
+    url, where, order = pedidos[0]
+    assert url.endswith("/axk9-g2nh.json")
+    assert "descripcion = 'A 90 DIAS'" in where and "fechacorte >= '2026-10-27T00:00:00'" in where
+    assert "fechacorte" in order

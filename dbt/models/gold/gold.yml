@@ -76,6 +76,8 @@ models:
         description: Promedio del Brent diario del mes, en USD por barril (de silver.brent.brent). Nulo si no hay datos.
       - name: fed_funds
         description: Tasa de fondos federales del mes, en porcentaje (de silver.fed.fed_funds). Nula si no hay dato.
+      - name: tasa_cdt_90
+        description: Tasa de captación de CDT a 90 días del mes, promedio ponderado por monto (de silver.cdt). Nula si no hay dato.
 
   - name: mart_mensual
     description: >
@@ -101,6 +103,8 @@ models:
         description: Brent promedio del mes en USD por barril (de gold.fact_indicadores_mensual.brent_promedio). Nulo si no hay dato.
       - name: fed_funds
         description: Tasa de fondos federales del mes (de gold.fact_indicadores_mensual.fed_funds). Nula si no hay dato.
+      - name: tasa_cdt_90
+        description: Tasa de CDT a 90 días del mes, ponderada por monto (de gold.fact_indicadores_mensual.tasa_cdt_90). Nula si no hay dato.
 
 
 unit_tests:
@@ -171,7 +175,11 @@ unit_tests:
       - input: ref('silver_fed')
         rows:
           - {mes: "2020-01-01", fed_funds: 1.55}
+      - input: ref('silver_cdt')
+        rows:
+          - {fecha: "2020-01-10", tasa: 4.0, monto: 100}
+          - {fecha: "2020-01-20", tasa: 5.0, monto: 300}
     expect:
       rows:
-        - {anio_mes: "2020-01-01", ipc: 100, tasa_vigente: 4.25, tasa_usura_consumo: 18.77, brent_promedio: "65.00", fed_funds: 1.55}
-        - {anio_mes: "2020-02-01", ipc: 101, tasa_vigente: 4.25, tasa_usura_consumo: null, brent_promedio: null, fed_funds: null}
+        - {anio_mes: "2020-01-01", ipc: 100, tasa_vigente: 4.25, tasa_usura_consumo: 18.77, brent_promedio: "65.00", fed_funds: 1.55, tasa_cdt_90: 4.75}
+        - {anio_mes: "2020-02-01", ipc: 101, tasa_vigente: 4.25, tasa_usura_consumo: null, brent_promedio: null, fed_funds: null, tasa_cdt_90: null}

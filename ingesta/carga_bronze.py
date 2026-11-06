@@ -56,6 +56,25 @@ def _extraer_usura(conn):
     )
 
 
+def ultima_fecha_cdt(conn):
+    """Mayor `fechacorte` ya cargada en bronze.cdt_raw, o None si está vacía."""
+    fila = conn.execute("select max((fila->>'fechacorte')::timestamp)::date from bronze.cdt_raw").fetchone()
+    return fila[0]
+
+
+def _extraer_cdt(conn):
+    """Tasa de captación de CDT a 90 días (Superfinanciera), solo desde la última fecha cargada menos el margen."""
+    from ingesta.extractores.trm_socrata import extraer_socrata
+
+    desde = desde_incremental(ultima_fecha_cdt(conn))
+    return extraer_socrata(
+        "https://www.datos.gov.co/resource/axk9-g2nh.json",
+        f"descripcion = 'A 90 DIAS' AND fechacorte >= '{desde}T00:00:00'",
+        "fechacorte, codigoentidad, tipoentidad, subcuenta",
+        tam_pagina=10000,
+    )
+
+
 def _extraer_fred(serie):
     def extraer(conn):
         from ingesta.extractores.fred import extraer_fred
@@ -71,6 +90,7 @@ FUENTES_API = {
     "usura": ("datos.gov.co/pare-7x5i", _extraer_usura),
     "brent": ("fred.stlouisfed.org/DCOILBRENTEU", _extraer_fred("DCOILBRENTEU")),
     "fed": ("fred.stlouisfed.org/FEDFUNDS", _extraer_fred("FEDFUNDS")),
+    "cdt": ("datos.gov.co/axk9-g2nh (CDT a 90 días)", _extraer_cdt),
 }
 
 

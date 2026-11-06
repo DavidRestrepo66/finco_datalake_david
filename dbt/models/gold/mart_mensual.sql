@@ -8,9 +8,10 @@ select
     ind.tasa_vigente,
     ind.tasa_usura_consumo,
     ind.brent_promedio,
-    ind.fed_funds
+    ind.fed_funds,
+    ind.tasa_cdt_90
 from {{ ref('fact_indicadores_mensual') }} as ind
 left join {{ ref('fact_trm_diaria') }} as trm
     on date_trunc('month', trm.fecha)::date = ind.anio_mes
 group by ind.anio_mes, ind.ipc, ind.inflacion_anual, ind.tasa_vigente,
-         ind.tasa_usura_consumo, ind.brent_promedio, ind.fed_funds
+         ind.tasa_usura_consumo, ind.brent_promedio, ind.fed_funds, ind.tasa_cdt_90

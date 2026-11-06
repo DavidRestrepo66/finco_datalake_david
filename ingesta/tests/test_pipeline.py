@@ -22,7 +22,7 @@ def _nombres(corredor):
 def test_ejecuta_en_orden_ingesta_de_las_fuentes_y_dbt_build(capsys):  # HU-12 escenario 1
     corredor = Corredor()
     assert pipeline.main([], correr=corredor, reloj=iter([0.0, 12.5]).__next__) == 0
-    assert _nombres(corredor) == ["trm", "ipc", "tasa", "usura", "brent", "fed", "dbt", "metabase.tablero"]
+    assert _nombres(corredor) == ["trm", "ipc", "tasa", "usura", "brent", "fed", "cdt", "dbt", "metabase.tablero"]
     assert corredor.comandos[-2][:2] == ["dbt", "build"]
 
 
