@@ -48,7 +48,9 @@ models:
   - name: fact_indicadores_mensual
     description: >
       Hecho mensual de indicadores, desde enero de 2020. Viene de silver.ipc y
-      silver.tasa_intervencion; la tasa es la vigente el último día del mes.
+      silver.tasa_intervencion; la tasa es la vigente el último día del mes. Suma la usura de
+      CONSUMO Y ORDINARIO vigente el último día del mes, el Brent promedio del mes y la tasa de
+      la Fed del mes; estas tres columnas quedan nulas en los meses sin dato.
     columns:
       - name: anio_mes
         description: Primer día del mes. Llave del hecho y referencia a dim_fecha.
@@ -68,11 +70,18 @@ models:
       - name: tasa_vigente
         description: Tasa de política monetaria vigente el último día del mes (de silver.tasa_intervencion.tasa).
         data_tests: [not_null]
+      - name: tasa_usura_consumo
+        description: Tasa de usura de la modalidad CONSUMO Y ORDINARIO vigente el último día del mes (de silver.usura.tasa_usura). Nula si no hay vigencia.
+      - name: brent_promedio
+        description: Promedio del Brent diario del mes, en USD por barril (de silver.brent.brent). Nulo si no hay datos.
+      - name: fed_funds
+        description: Tasa de fondos federales del mes, en porcentaje (de silver.fed.fed_funds). Nula si no hay dato.
 
   - name: mart_mensual
     description: >
       Mart mensual para el tablero y la app: una fila por mes con TRM promedio (de
-      fact_trm_diaria) y el IPC, la inflación anual y la tasa vigente (de fact_indicadores_mensual).
+      fact_trm_diaria) y el IPC, la inflación anual, la tasa vigente, la usura de consumo, el Brent
+      promedio y la tasa de la Fed (de fact_indicadores_mensual).
       El mes sin TRM queda con trm_promedio nulo.
     columns:
       - name: anio_mes
@@ -86,6 +95,12 @@ models:
         description: Inflación anual en porcentaje (de gold.fact_indicadores_mensual.inflacion_anual).
       - name: tasa_vigente
         description: Tasa de política monetaria vigente al cierre del mes (de gold.fact_indicadores_mensual.tasa_vigente).
+      - name: tasa_usura_consumo
+        description: Tasa de usura CONSUMO Y ORDINARIO vigente al cierre del mes (de gold.fact_indicadores_mensual.tasa_usura_consumo). Nula si no hay dato.
+      - name: brent_promedio
+        description: Brent promedio del mes en USD por barril (de gold.fact_indicadores_mensual.brent_promedio). Nulo si no hay dato.
+      - name: fed_funds
+        description: Tasa de fondos federales del mes (de gold.fact_indicadores_mensual.fed_funds). Nula si no hay dato.
 
 
 unit_tests:
@@ -131,3 +146,32 @@ unit_tests:
       rows:
         - {fecha: "2020-01-04", valor: 3262.05, vigencia_desde: "2020-01-04", vigencia_hasta: "2020-01-06", lote_id: "00000000-0000-0000-0000-00000000000a"}
         - {fecha: "2020-01-05", valor: 3262.05, vigencia_desde: "2020-01-04", vigencia_hasta: "2020-01-06", lote_id: "00000000-0000-0000-0000-00000000000a"}
+
+  - name: indicadores_une_usura_brent_y_fed
+    description: >
+      El mes toma la usura CONSUMO Y ORDINARIO vigente el último día, el promedio del Brent diario
+      y la Fed del mes; un mes sin esos datos queda nulo.
+    model: fact_indicadores_mensual
+    given:
+      - input: ref('silver_ipc')
+        rows:
+          - {mes: "2020-01-01", indice: 100}
+          - {mes: "2020-02-01", indice: 101}
+      - input: ref('silver_tasa_intervencion')
+        rows:
+          - {fecha_inicio: "2020-01-01", fecha_fin: "2020-02-29", tasa: 4.25}
+      - input: ref('silver_usura')
+        rows:
+          - {modalidad: "CONSUMO Y ORDINARIO", vigencia_desde: "2020-01-01", vigencia_hasta: "2020-01-31", tasa_usura: 18.77}
+          - {modalidad: "CONSUMO BAJO MONTO", vigencia_desde: "2020-01-01", vigencia_hasta: "2020-02-29", tasa_usura: 34.18}
+      - input: ref('silver_brent')
+        rows:
+          - {fecha: "2020-01-02", brent: 60}
+          - {fecha: "2020-01-03", brent: 70}
+      - input: ref('silver_fed')
+        rows:
+          - {mes: "2020-01-01", fed_funds: 1.55}
+    expect:
+      rows:
+        - {anio_mes: "2020-01-01", ipc: 100, tasa_vigente: 4.25, tasa_usura_consumo: 18.77, brent_promedio: "65.00", fed_funds: 1.55}
+        - {anio_mes: "2020-02-01", ipc: 101, tasa_vigente: 4.25, tasa_usura_consumo: null, brent_promedio: null, fed_funds: null}

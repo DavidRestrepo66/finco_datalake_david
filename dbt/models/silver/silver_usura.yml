@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: silver_usura
+    description: >
+      Tasa de usura (interés bancario corriente) por modalidad y periodo de vigencia, todas las
+      modalidades. La tasa se publica con '%' y aquí es numérica. Una vigencia repetida en varios
+      lotes conserva el lote más reciente. Las vigencias de una misma modalidad no se solapan.
+    columns:
+      - name: modalidad
+        description: Modalidad de crédito (p. ej. CONSUMO Y ORDINARIO).
+        data_tests: [not_null]
+      - name: vigencia_desde
+        description: Primer día en que rige la tasa.
+        data_tests: [not_null]
+      - name: vigencia_hasta
+        description: Último día en que rige la tasa.
+        data_tests: [not_null]
+      - name: tasa_usura
+        description: Tasa de usura en porcentaje, sin el símbolo '%'.
+        data_tests: [not_null]
+      - name: lote_id
+        description: Lote de bronze del que viene el valor.
+      - name: cargado_en
+        description: Momento de carga del lote.
+
+unit_tests:
+  - name: usura_quita_porcentaje_y_conserva_modalidades
+    description: La tasa pasa a numérico sin '%' y todas las modalidades se conservan.
+    model: silver_usura
+    given:
+      - input: source('bronze', 'usura_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"modalidad": "CONSUMO Y ORDINARIO", "vigencia_desde": "2020-01-01T00:00:00.000", "vigencia_hasta": "2020-01-31T00:00:00.000", "interes_bancario_corriente": "18.77%"}'}
+          - {id: 2, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"modalidad": "CONSUMO BAJO MONTO", "vigencia_desde": "2019-10-01T00:00:00.000", "vigencia_hasta": "2020-09-30T00:00:00.000", "interes_bancario_corriente": "34.18%"}'}
+    expect:
+      rows:
+        - {modalidad: "CONSUMO Y ORDINARIO", vigencia_desde: "2020-01-01", vigencia_hasta: "2020-01-31", tasa_usura: 18.77, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00"}
+        - {modalidad: "CONSUMO BAJO MONTO", vigencia_desde: "2019-10-01", vigencia_hasta: "2020-09-30", tasa_usura: 34.18, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00"}
+
+  - name: usura_gana_el_lote_mas_reciente
+    description: Una vigencia repetida en dos lotes toma la tasa del lote más reciente.
+    model: silver_usura
+    given:
+      - input: source('bronze', 'usura_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"modalidad": "CONSUMO Y ORDINARIO", "vigencia_desde": "2020-01-01T00:00:00.000", "vigencia_hasta": "2020-01-31T00:00:00.000", "interes_bancario_corriente": "18.00%"}'}
+          - {id: 2, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00", fila: '{"modalidad": "CONSUMO Y ORDINARIO", "vigencia_desde": "2020-01-01T00:00:00.000", "vigencia_hasta": "2020-01-31T00:00:00.000", "interes_bancario_corriente": "18.77%"}'}
+    expect:
+      rows:
+        - {modalidad: "CONSUMO Y ORDINARIO", vigencia_desde: "2020-01-01", vigencia_hasta: "2020-01-31", tasa_usura: 18.77, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00"}

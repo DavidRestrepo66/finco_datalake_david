@@ -10,8 +10,8 @@ Rama feat/nuevas-fuentes (sobre #27 y #28). Hasta el mart y la app; un commit po
 
 ## Tasks
 - T1 (S1,S5) infraestructura de ingesta de fuentes API + pipeline: pendiente
-- T2 (S3) usura: pendiente
-- T3 (S3) Brent y Fed: pendiente
+- T2 (S3) usura: hecho (dbt; sin commit)
+- T3 (S3) Brent y Fed: hecho (dbt; sin commit)
 - T4 (S5) CDT 90: pendiente
 - T5 (S4) app/Análisis: pendiente
 - T6 docs, manual, trazabilidad: pendiente
