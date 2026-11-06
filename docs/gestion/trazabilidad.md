@@ -16,6 +16,7 @@ La evidencia de las corridas está en `docs/pruebas/evidencia/ejecucion-2026-10-
 | RF-07 | HU-13 | CU-05 | CP-DASH-01 | Metabase | Hecho y verificado por API (PR #16, #18) |
 | RF-08 | HU-12, 02 | CU-02, CU-08 | CP-E2E-01 | `pipeline.py`, `verificar.py` | Hecho y verificado (HU-12 y HU-02) |
 | RF-09 | HU-14 | CU-06 | CP-APP-01 | `app/` | Hecho (PR #13, #19) |
+| RF-01c | HU-15, HU-16 | CU-03 | pruebas `ingesta/` y `dbt build` | `ingesta/`, `dbt/` (usura, CDT, Brent, Fed) | Hecho en `feat/nuevas-fuentes`, sin merge |
 | RNF-01 | HU-01, 02 | CU-01, CU-08 | CP-INST-01 | `docker-compose.yml`, `Dockerfile` | Hecho y verificado en clon limpio (HU-01 y HU-02) |
 | RNF-02 | HU-12 | CU-02 | CP-E2E-01 | `pipeline.py` | Medido: 12.0 s (umbral < 5 min) |
 | RNF-03 | Todas | — | `verificar.py` | ruff | Hecho |

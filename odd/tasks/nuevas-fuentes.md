@@ -14,7 +14,7 @@ Rama feat/nuevas-fuentes (sobre #27 y #28). Hasta el mart y la app; un commit po
 - T3 (S3) Brent y Fed: hecho (dbt; sin commit)
 - T4 (S5) CDT 90: hecho (ingesta incremental + dbt; dbt build 69 PASS)
 - T5 (S4) app/Análisis: hecho (84 tests)
-- T6 docs, manual, trazabilidad: pendiente
+- T6 docs, manual, trazabilidad: hecho
 
 ## Log
 L1: "buano ahora quiero agregar mas fuentes"
