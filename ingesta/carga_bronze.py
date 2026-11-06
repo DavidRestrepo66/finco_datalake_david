@@ -13,6 +13,7 @@ se guarda completa como `jsonb` (texto original), porque el formato del Banco pu
 cambiar de columnas sin que bronze tenga que cambiar.
 """
 
+import datetime as dt
 import logging
 import os
 import sys
@@ -37,7 +38,12 @@ CONJUNTOS_CSV = {
     "ipc": (FUENTE_IPC, RAIZ_FUENTES / "ipc.csv"),
     "tasa_intervencion": (FUENTE_TASA, RAIZ_FUENTES / "tasa_intervencion.csv"),
 }
-USO = "uso: python -m ingesta.carga_bronze trm | ipc [ruta.csv] | tasa [ruta.csv]"
+USO = "uso: python -m ingesta.carga_bronze trm [--completo] | ipc [ruta.csv] | tasa [ruta.csv]"
+
+
+# La TRM se pide desde (última vigencia cargada − margen): el solape recoge correcciones recientes de la
+# fuente y es inocuo porque silver deja, por día, el lote más reciente.
+MARGEN_DIAS = 7
 
 
 def conectar():
@@ -138,6 +144,32 @@ def cargar_csv(conn, conjunto, filas, meta, lote_id=None, cargado_en=None):
     return lote_id
 
 
+def ultima_vigencia(conn):
+    """Mayor `vigenciadesde` ya cargada en bronze.trm_raw, o None si está vacía."""
+    fila = conn.execute("select max(vigenciadesde::timestamp)::date from bronze.trm_raw").fetchone()
+    return fila[0]
+
+
+def desde_incremental(ultima):
+    """Fecha (ISO) desde la que pedir la TRM: todo si no hay carga previa; si no, la última menos el margen."""
+    from ingesta.extractores.trm_socrata import FECHA_INICIO
+
+    if ultima is None:
+        return FECHA_INICIO
+    return max(ultima - dt.timedelta(days=MARGEN_DIAS), dt.date.fromisoformat(FECHA_INICIO)).isoformat()
+
+
+def desde_trm(completo):
+    """Desde qué fecha pedir la TRM: todo con `completo`, o solo lo nuevo según lo ya cargado."""
+    from ingesta.extractores.trm_socrata import FECHA_INICIO
+
+    if completo:
+        return FECHA_INICIO
+    with conectar() as conn:
+        crear_tablas(conn)
+        return desde_incremental(ultima_vigencia(conn))
+
+
 def main_csv(conjunto, ruta):
     from ingesta.extractores.banrep import leer_csv
 
@@ -167,12 +199,13 @@ def main(argv):
     if len(argv) in (1, 2) and argv[0] in ("ipc", "tasa"):
         conjunto = "ipc" if argv[0] == "ipc" else "tasa_intervencion"
         return main_csv(conjunto, argv[1] if len(argv) == 2 else None)
-    if argv != ["trm"]:
+    if argv not in (["trm"], ["trm", "--completo"]):
         print(USO, file=sys.stderr)
         return 2
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     try:
-        filas = extraer_trm()
+        desde = desde_trm(completo=argv == ["trm", "--completo"])
+        filas = extraer_trm(desde=desde)
     except ExtraccionError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
@@ -182,7 +215,7 @@ def main(argv):
     with conectar() as conn:
         crear_tablas(conn)
         cargar_trm(conn, filas, lote, ahora)
-    print(f"TRM: {len(filas)} registros en {ruta} y en bronze.trm_raw, lote {lote}")
+    print(f"TRM desde {desde}: {len(filas)} registros en {ruta} y en bronze.trm_raw, lote {lote}")
     return 0
 
 

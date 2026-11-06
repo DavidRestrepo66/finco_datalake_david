@@ -51,6 +51,14 @@ def test_filtra_desde_2020_y_ordena():
     assert sesion.llamadas[0]["$order"] == "vigenciadesde"
 
 
+def test_con_desde_pide_solo_lo_nuevo_y_sin_desde_conserva_2020():
+    sesion = FakeSession(_filas(3))
+    extraer_trm(sesion, tam_pagina=10, desde="2026-10-20")
+    assert "2026-10-20T00:00:00" in sesion.llamadas[0]["$where"]
+    assert "2020-01-01" not in sesion.llamadas[0]["$where"]
+    assert sesion.llamadas[0]["$order"] == "vigenciadesde"
+
+
 def test_conserva_el_valor_original_sin_transformar():
     filas = [{"valor": "3158.43", "vigenciadesde": "x", "vigenciahasta": "y"}]
     assert extraer_trm(FakeSession(filas))[0]["valor"] == "3158.43"
