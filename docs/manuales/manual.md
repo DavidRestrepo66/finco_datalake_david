@@ -13,6 +13,10 @@ docker compose run --rm pipeline          # ingesta de TRM, IPC y tasa + dbt bui
 docker compose --profile app up app       # app web: http://localhost:8501
 ```
 
+La TRM se carga de forma incremental: cada corrida pide a datos.gov.co solo desde la última vigencia ya cargada
+(menos 7 días de margen para recoger correcciones). La primera corrida trae todo desde 2020. Para forzar la
+carga completa: `python -m ingesta.carga_bronze trm --completo`.
+
 ### Qué se obtiene
 - **Tablero (Metabase):** http://localhost:3000, tablero «Tablero macroeconómico» con filtro de fechas.
   Se crea automáticamente al final del pipeline (`metabase/tablero.py`, con `METABASE_ADMIN_EMAIL` y
