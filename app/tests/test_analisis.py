@@ -211,3 +211,38 @@ def test_atajo_de_anio_se_recorta_a_los_meses_disponibles_y_se_omite_si_no_hay()
     meses = [dt.date(2023, m, 1) for m in range(1, 7)]
     assert analisis.atajos(meses)["2023"] == (dt.date(2023, 1, 1), dt.date(2023, 6, 1))
     assert "2023" not in analisis.atajos([dt.date(2024, 1, 1), dt.date(2024, 2, 1)])
+
+
+# --- Nuevas fuentes: Brent, usura y CDT ---
+
+
+def mes_ext(m, trm, brent, tasa, usura, cdt=None):
+    f = mes(m, trm, 5.0, tasa)
+    f.update({"brent_promedio": brent, "tasa_usura_consumo": usura, "tasa_cdt_90": cdt})
+    return f
+
+
+def test_factores_correlacion_trm_brent_y_spread_de_usura():
+    filas = [mes_ext(1, 1.0, 10.0, 5.0, 20.0), mes_ext(2, 2.0, 20.0, 5.0, 21.0), mes_ext(3, 3.0, 30.0, 6.0, 22.0)]
+    f = analisis.factores(filas)
+    assert f["correlacion_trm_brent"] == pytest.approx(1.0)
+    assert f["usura_ultima"] == 22.0
+    assert f["spread_usura_tasa"] == pytest.approx(16.0)  # 22 - 6
+
+
+def test_factores_ignora_meses_sin_brent_y_no_correlaciona_con_menos_de_tres():
+    filas = [mes_ext(1, 1.0, None, 5.0, 20.0), mes_ext(2, 2.0, 20.0, 5.0, 21.0), mes_ext(3, 3.0, 30.0, 6.0, 22.0)]
+    assert analisis.factores(filas)["correlacion_trm_brent"] is None
+
+
+def test_factores_sin_columnas_nuevas_o_sin_filas_devuelve_none():
+    assert analisis.factores([]) is None
+    assert analisis.factores(FILAS) is None  # filas del mart anterior, sin las columnas nuevas
+
+
+def test_lectura_factores_menciona_brent_y_usura():
+    filas = [mes_ext(1, 1.0, 10.0, 5.0, 20.0), mes_ext(2, 2.0, 20.0, 5.0, 21.0), mes_ext(3, 3.0, 30.0, 6.0, 22.0)]
+    textos = analisis.lectura_factores(filas)
+    assert any("Brent" in t and "r = 1,00" in t for t in textos)
+    assert any("usura" in t and "16,0" in t for t in textos)
+    assert analisis.lectura_factores([]) == []

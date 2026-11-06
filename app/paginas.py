@@ -165,6 +165,17 @@ def analisis_pagina(ctx):
         _html('<div class="subtitulo">Generada a partir de los datos filtrados</div>')
         _html(estilos.lectura(analisis.lectura(filas)))
 
+    if analisis.factores(filas) is not None:
+        _html(estilos.titulo2("Brent y crédito", "fuentes nuevas: FRED y Superfinanciera"))
+        izq, der = st.columns(2, gap="large")
+        with izq:
+            _html('<div class="subtitulo">TRM frente al Brent (USD por barril)</div>')
+            st.plotly_chart(graficos.figura_trm_brent(filas, ctx.tema), use_container_width=True, config=graficos.CONFIG, theme=None)
+        with der:
+            _html('<div class="subtitulo">Tasa de intervención frente a usura de consumo y CDT a 90 días</div>')
+            st.plotly_chart(graficos.figura_credito(filas, ctx.tema), use_container_width=True, config=graficos.CONFIG, theme=None)
+        _html(estilos.lectura(analisis.lectura_factores(filas)))
+
 
 def selector_columnas(columnas, clave):
     """Buscador de columnas: elegir una la agrega como etiqueta con ✕ debajo. Siempre queda al menos una."""

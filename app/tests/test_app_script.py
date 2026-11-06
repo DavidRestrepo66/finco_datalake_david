@@ -121,7 +121,7 @@ def test_datos_columnas_se_quitan_con_x_y_se_agregan_con_el_buscador():
     at = ejecutar("Datos")
     clave = "vis_mart_mensual"
     todas = list(at.session_state[clave])
-    assert len(todas) == 5
+    assert len(todas) >= 5 and todas[:5] == ["anio_mes", "trm_promedio", "ipc", "inflacion_anual", "tasa_vigente"]
 
     quitar = next(b for b in at.button if b.label == "trm_promedio ✕")
     quitar.click().run()
@@ -136,7 +136,7 @@ def test_datos_columnas_se_quitan_con_x_y_se_agregan_con_el_buscador():
 
 def test_datos_no_permite_quitar_la_ultima_columna():
     at = ejecutar("Datos")
-    for nombre in ["trm_promedio", "ipc", "inflacion_anual", "tasa_vigente"]:
+    for nombre in list(at.session_state["vis_mart_mensual"])[1:]:
         next(b for b in at.button if b.label == f"{nombre} ✕").click().run()
     assert at.session_state["vis_mart_mensual"] == ["anio_mes"]
     assert next(b for b in at.button if b.label == "anio_mes ✕").disabled
