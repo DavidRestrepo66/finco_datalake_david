@@ -19,12 +19,12 @@ class ExtraccionError(Exception):
     """La fuente siguió fallando después de todos los reintentos."""
 
 
-def _pedir_pagina(sesion, params, espera):
+def _pedir_pagina(sesion, params, espera, url=URL):
     """Pide una página; ante fallas de red o HTTP reintenta con espera creciente."""
     intentos = REINTENTOS + 1
     for intento in range(1, intentos + 1):
         try:
-            respuesta = sesion.get(URL, params=params, timeout=TIMEOUT_SEGUNDOS)
+            respuesta = sesion.get(url, params=params, timeout=TIMEOUT_SEGUNDOS)
             respuesta.raise_for_status()
             return respuesta.json()
         except requests.RequestException as e:
@@ -36,20 +36,22 @@ def _pedir_pagina(sesion, params, espera):
             espera(pausa)
 
 
-def extraer_trm(sesion=None, tam_pagina=TAM_PAGINA, espera=time.sleep):
-    """Devuelve todas las filas de la TRM desde FECHA_INICIO, tal como las entrega la fuente."""
+def extraer_socrata(url, where, order, sesion=None, tam_pagina=TAM_PAGINA, espera=time.sleep):
+    """Todas las filas de un dataset Socrata que cumplen `where`, paginadas y ordenadas por `order`."""
     sesion = sesion or requests.Session()
     filas = []
     offset = 0
     while True:
-        params = {
-            "$where": f"vigenciadesde >= '{FECHA_INICIO}T00:00:00'",
-            "$order": "vigenciadesde",
-            "$limit": tam_pagina,
-            "$offset": offset,
-        }
-        pagina = _pedir_pagina(sesion, params, espera)
+        params = {"$where": where, "$order": order, "$limit": tam_pagina, "$offset": offset}
+        pagina = _pedir_pagina(sesion, params, espera, url)
         filas.extend(pagina)
         if len(pagina) < tam_pagina:
             return filas
         offset += tam_pagina
+
+
+def extraer_trm(sesion=None, tam_pagina=TAM_PAGINA, espera=time.sleep, desde=FECHA_INICIO):
+    """Devuelve las filas de la TRM con vigenciadesde >= `desde` (por defecto FECHA_INICIO), tal como las entrega la fuente."""
+    return extraer_socrata(
+        URL, f"vigenciadesde >= '{desde}T00:00:00'", "vigenciadesde", sesion, tam_pagina, espera
+    )

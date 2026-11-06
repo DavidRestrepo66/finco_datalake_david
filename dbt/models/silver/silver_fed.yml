@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: silver_fed
+    description: >
+      Tasa de fondos federales de EE. UU. (FRED, FEDFUNDS), una fila por mes. Un mes repetido
+      en varios lotes conserva el lote más reciente.
+    columns:
+      - name: mes
+        description: Primer día del mes de la observación.
+        data_tests: [unique, not_null]
+      - name: fed_funds
+        description: Tasa efectiva de fondos federales del mes, en porcentaje.
+        data_tests: [not_null]
+      - name: lote_id
+        description: Lote de bronze del que viene el valor.
+      - name: cargado_en
+        description: Momento de carga del lote.
+
+unit_tests:
+  - name: fed_tipa_mes_y_tasa
+    description: La observación mensual queda con el primer día del mes y la tasa numérica.
+    model: silver_fed
+    given:
+      - input: source('bronze', 'fed_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"observation_date": "2020-01-01", "FEDFUNDS": "1.55"}'}
+    expect:
+      rows:
+        - {mes: "2020-01-01", fed_funds: 1.55, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00"}
+
+  - name: fed_gana_el_lote_mas_reciente
+    description: Un mes repetido en dos lotes toma el valor del lote más reciente.
+    model: silver_fed
+    given:
+      - input: source('bronze', 'fed_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"observation_date": "2020-01-01", "FEDFUNDS": "1.00"}'}
+          - {id: 2, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00", fila: '{"observation_date": "2020-01-01", "FEDFUNDS": "1.55"}'}
+    expect:
+      rows:
+        - {mes: "2020-01-01", fed_funds: 1.55, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00"}

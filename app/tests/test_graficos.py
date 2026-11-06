@@ -117,3 +117,31 @@ def test_sin_filas_devuelve_figura_vacia_sin_fallar():
 def test_tema_desconocido_es_error():
     with pytest.raises(ValueError):
         graficos.figura_principal(filas(), BANDAS, tema="sepia")
+
+
+def filas_ext(n=24):
+    out = filas(n)
+    for i, f in enumerate(out):
+        f.update({"brent_promedio": 60.0 + i, "tasa_usura_consumo": 28.0 - 0.1 * i, "tasa_cdt_90": 7.0 + 0.05 * i})
+    return out
+
+
+def test_trm_brent_tiene_trm_a_la_izquierda_y_brent_a_la_derecha():
+    fig = graficos.figura_trm_brent(filas_ext())
+    assert [t.name for t in fig.data] == ["TRM promedio", "Brent promedio"]
+    assert fig.data[0].yaxis == "y" and fig.data[1].yaxis == "y2"
+    assert fig.layout.yaxis2.title.text == "USD/barril"
+
+
+def test_credito_compara_intervencion_usura_y_cdt_en_un_solo_eje():
+    fig = graficos.figura_credito(filas_ext())
+    assert [t.name for t in fig.data] == ["Tasa de intervención", "Tasa de usura (consumo)", "CDT a 90 días"]
+    assert fig.data[0].line.shape == "hv"
+    for t in fig.data:
+        assert t.line.color.startswith("#")
+
+
+def test_nuevas_figuras_aceptan_tema_oscuro_y_rechazan_desconocido():
+    assert graficos.figura_credito(filas_ext(), tema="oscuro").layout.paper_bgcolor == "#0f1a1d"
+    with pytest.raises(ValueError):
+        graficos.figura_trm_brent(filas_ext(), tema="sepia")
