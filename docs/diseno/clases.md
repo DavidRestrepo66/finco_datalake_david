@@ -163,6 +163,8 @@ classDiagram
     Verificar ..> Dbt : ejecuta build
 ```
 
+> Nota: `ExtractorTrm` se apoya en `extraer_socrata` (genérico, también para usura y CDT); `fred.py` aporta `extraer_fred` para Brent y la tasa de la Fed. El mart suma `tasaUsuraConsumo`, `brentPromedio`, `fedFunds` y `tasaCdt90`.
+
 ### Responsabilidades
 
 | Clase o módulo | Responsabilidad | Requisito |

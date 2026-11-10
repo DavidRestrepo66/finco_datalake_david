@@ -28,6 +28,7 @@ flowchart LR
     end
 
     SOC([API Socrata datos.gov.co])
+    FRD([API FRED])
     MBA([API de Metabase])
 
     IE --- CU01
@@ -40,6 +41,7 @@ flowchart LR
     AF --- CU07
     PO --- CU04
     CU03 --- SOC
+    CU03 --- FRD
     CU09 --- MBA
 
     CU02 -. "«include»" .-> CU03
@@ -59,7 +61,7 @@ El caso CU-09 se separa de CU-02 porque el pipeline lo ejecuta como última etap
 |---|---|---|---|---|---|
 | CU-01 | Levantar el entorno con `docker compose up -d` | Integrante | — | HU-01 | RNF-01 |
 | CU-02 | Ejecutar el pipeline con `docker compose run --rm pipeline` | Evaluador, integrante | — | HU-12 | RF-08, RNF-02 |
-| CU-03 | Cargar TRM, IPC y tasa a bronze (Parquet + PostgreSQL) | Pipeline (invocado por CU-02) | API Socrata | HU-03 a HU-06 | RF-01, RF-02 |
+| CU-03 | Cargar TRM, IPC, tasa, usura, CDT, Brent y Fed a bronze (Parquet + PostgreSQL) | Pipeline (invocado por CU-02) | API Socrata, API FRED | HU-03 a HU-06, HU-15, HU-16 | RF-01, RF-02 |
 | CU-04 | Construir silver y gold con `dbt build` | Integrante, PO (acepta) | — | HU-07 a HU-10 | RF-01b, RF-03 a RF-05 |
 | CU-05 | Consultar el tablero macroeconómico | Analista | — | HU-13 | RF-07 |
 | CU-06 | Consultar y descargar datos de gold en la aplicación web | Analista | — | HU-14 | RF-09 |
@@ -94,7 +96,7 @@ postcondiciones, reglas de negocio y trazabilidad.
 | Objetivo | Cargar y transformar todo en un solo comando |
 | Precondiciones | Entorno levantado (CU-01) |
 | Disparador | `docker compose run --rm pipeline` |
-| Flujo principal | 1) Ingesta de TRM (incluye CU-03). 2) Ingesta de IPC. 3) Ingesta de tasa. 4) `dbt build` (CU-04). 5) Creación del tablero (CU-09). 6) Informa la duración total y termina con código 0. |
+| Flujo principal | 1) Ingesta de TRM (incluye CU-03). 2) Ingesta de IPC. 3) Ingesta de tasa. 4) Ingesta de usura, Brent, Fed y CDT a 90 días. 5) `dbt build` (CU-04). 6) Creación del tablero (CU-09). 7) Informa la duración total y termina con código 0. |
 | Flujos alternos | **A1.** Una etapa termina con código distinto de 0: el pipeline no ejecuta las etapas siguientes, informa cuál falló y termina con código distinto de 0. |
 | Postcondiciones | Datos cargados en bronze, silver y gold; tablero creado |
 | Reglas | RNF-02: menos de 5 minutos |
@@ -104,12 +106,12 @@ postcondiciones, reglas de negocio y trazabilidad.
 
 | Campo | Contenido |
 |---|---|
-| Actores | Pipeline; secundario: API Socrata (solo TRM) |
+| Actores | Pipeline; secundarios: API Socrata (TRM, usura, CDT) y API FRED (Brent, Fed) |
 | Objetivo | Conservar el dato original, sin transformar, con metadatos de lote |
 | Precondiciones | PostgreSQL sano; para IPC y tasa, CSV en `data/fuentes/` |
 | Disparador | Etapa de ingesta de CU-02 |
-| Flujo principal | 1) Se lee la fuente: TRM paginada desde la API; IPC y tasa desde CSV. 2) Se genera un `lote_id` y `cargado_en`. 3) Se escribe un Parquet inmutable por lote. 4) Se insertan las filas en `bronze.*_raw` con fuente, fecha-hora y lote. |
-| Flujos alternos | **A1 (TRM).** La API falla: se reintenta al menos 3 veces con espera creciente; si todos fallan, se registra el error y el código de salida es distinto de 0. **A2 (CSV).** El archivo no existe o no tiene filas: termina con código 1 y no crea lote. |
+| Flujo principal | 1) Se lee la fuente: TRM, usura y CDT paginados desde Socrata; Brent y Fed desde FRED; IPC y tasa desde CSV. 2) Se genera un `lote_id` y `cargado_en`. 3) Se escribe un Parquet inmutable por lote. 4) Se insertan las filas en `bronze.*_raw` con fuente, fecha-hora y lote. |
+| Flujos alternos | **A1 (APIs).** Socrata o FRED fallan: se reintenta al menos 3 veces con espera creciente; si todos fallan, se registra el error y el código de salida es distinto de 0. **A2 (CSV).** El archivo no existe o no tiene filas: termina con código 1 y no crea lote. |
 | Postcondiciones | Un lote nuevo por ejecución; los lotes anteriores no se modifican |
 | Reglas | Inmutabilidad de bronze; la fila del CSV se guarda completa como `jsonb` |
 | Trazabilidad | HU-03, 04, 05, 06; RF-01, RF-02; CP-ING-01, 02, 03 |
@@ -122,7 +124,7 @@ postcondiciones, reglas de negocio y trazabilidad.
 | Objetivo | Producir tablas limpias y el modelo estrella con calidad verificada |
 | Precondiciones | Bronze con al menos un lote por fuente |
 | Disparador | Etapa `dbt build` de CU-02 |
-| Flujo principal | 1) Silver: TRM única por día (gana el lote más reciente); IPC por mes desde 2019; tasa con `fecha_inicio` y `fecha_fin` sin solapes. 2) Gold: `dim_fecha`, `fact_trm_diaria`, `fact_indicadores_mensual` y `mart_mensual`. 3) Se ejecutan las pruebas de calidad. |
+| Flujo principal | 1) Silver: TRM única por día (gana el lote más reciente); IPC por mes desde 2019; tasa con `fecha_inicio` y `fecha_fin` sin solapes; usura, CDT, Brent y Fed limpios y tipados. 2) Gold: `dim_fecha`, `fact_trm_diaria`, `fact_indicadores_mensual` y `mart_mensual`. 3) Se ejecutan las pruebas de calidad. |
 | Flujos alternos | **A1.** Una prueba falla (unicidad, no nulidad, `relationships`): el build falla e identifica el registro. |
 | Postcondiciones | `silver.*` y `gold.*` actualizados |
 | Reglas | Opción B de periodicidad (ADR-01); el mart arranca en 2020-01 |

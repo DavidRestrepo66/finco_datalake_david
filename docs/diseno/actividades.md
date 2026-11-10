@@ -20,6 +20,7 @@ flowchart TD
         B(Ingesta TRM)
         C(Ingesta IPC)
         D(Ingesta tasa de intervención)
+        D0(Ingesta usura, Brent, Fed y CDT a 90 días)
         E(dbt build)
         F(Crear tablero en Metabase)
         G(Informar duración total)
@@ -34,7 +35,7 @@ flowchart TD
     A --> B --> D1
     D1 -- "[sí]" --> C --> D2
     D2 -- "[sí]" --> D --> D3
-    D3 -- "[sí]" --> E --> D4
+    D3 -- "[sí]" --> D0 --> E --> D4
     D4 -- "[sí]" --> F --> D5
     D5 -- "[sí]" --> G --> OK((◉ código 0))
     D1 -- "[no]" --> H
@@ -47,7 +48,7 @@ flowchart TD
 
 ## 2. Cargar una fuente a bronze (CU-03, HU-03 a HU-06, RF-01, RF-02)
 
-Dos caminos de lectura según la fuente; ambos convergen en la escritura de un lote.
+Dos caminos de lectura según la fuente; ambos convergen en la escritura de un lote. El camino «TRM» aplica igual a usura y CDT (extractor Socrata genérico, `extraer_socrata`) y, con la misma lógica de reintentos, a Brent y Fed vía FRED (`fred.py`).
 
 ```mermaid
 flowchart TD

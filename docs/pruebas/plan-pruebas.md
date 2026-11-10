@@ -56,11 +56,13 @@ La matriz está en `docs/gestion/trazabilidad.md`; un requisito sin caso de prue
 
 | ID | Caso | Requisito | HU | Tipo | Estado |
 |---|---|---|---|---|---|
-| CP-E2E-01 | Pipeline completo termina con código 0 | RF-08, RNF-02 | HU-12 | Sistema | Ejecutada en Docker: código 0, `PASS=43 ERROR=0`, entre 12 y 18 s |
+| CP-E2E-01 | Pipeline completo termina con código 0 | RF-08, RNF-02 | HU-12 | Sistema | Ejecutada en Docker: código 0, `PASS=43 ERROR=0`, entre 12 y 18 s (con usura, Brent, Fed y CDT: `dbt build` 69 PASS, ver `odd/tasks/nuevas-fuentes.md`) |
 | CP-DASH-01 | Tablero muestra 3 visualizaciones con datos | RF-07 | HU-13 | Aceptación | Verificada por API: 3 tarjetas, 81 filas cada una, filtro `Fechas` |
 | CP-LIN-01 | Cada columna del mart tiene descripción y el grafo llega a bronze | RF-06, RNF-05 | HU-11 | Aceptación | Manual con `dbt docs` |
 | CP-INST-01 | Instalación en máquina limpia siguiendo el README | RNF-01, RF-08 | HU-02 | Instalación | Ejecutada el 30 oct en clon limpio: pasa (`docs/pruebas/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`) |
 | CP-CAL-01 | Estilo y calidad estática del código | RNF-03 | Todas | Estática | `ruff` dentro de `verificar.py` |
+
+Las fuentes nuevas (usura, CDT, Brent, Fed) se cubren con las pruebas `unique`/`not_null` de sus modelos silver y con las de `ingesta/tests`, dentro de CP-ING-01/02, CP-SIL-01 y CP-E2E-01.
 
 CP-APP-01, CP-PIPE-01, CP-DASH-02 y CP-LIN-01 se agregaron en este plan; no estaban en el README.
 
