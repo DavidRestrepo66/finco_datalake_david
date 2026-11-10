@@ -15,6 +15,10 @@ ETAPAS = [
     ("ingesta TRM", [sys.executable, "-m", "ingesta.carga_bronze", "trm"]),
     ("ingesta IPC", [sys.executable, "-m", "ingesta.carga_bronze", "ipc"]),
     ("ingesta tasa de intervención", [sys.executable, "-m", "ingesta.carga_bronze", "tasa"]),
+    ("ingesta tasa de usura", [sys.executable, "-m", "ingesta.carga_bronze", "usura"]),
+    ("ingesta Brent", [sys.executable, "-m", "ingesta.carga_bronze", "brent"]),
+    ("ingesta tasa de la Fed", [sys.executable, "-m", "ingesta.carga_bronze", "fed"]),
+    ("ingesta CDT a 90 días", [sys.executable, "-m", "ingesta.carga_bronze", "cdt"]),
     ("dbt build", ["dbt", "build", "--project-dir", "dbt", "--profiles-dir", "dbt"]),
     ("tablero Metabase", [sys.executable, "-m", "metabase.tablero"]),
 ]

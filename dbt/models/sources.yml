@@ -10,3 +10,11 @@ sources:
         description: Filas del CSV de IPC del Banco de la República, completas en `fila` (jsonb, texto). Un lote por carga.
       - name: tasa_intervencion_raw
         description: Filas del CSV de tasa de política monetaria del Banco de la República, completas en `fila` (jsonb, texto). Un lote por carga.
+      - name: usura_raw
+        description: Filas de la tasa de usura (datos.gov.co), completas en `fila` (jsonb, texto). Un lote por carga.
+      - name: brent_raw
+        description: Filas del Brent diario (FRED, DCOILBRENTEU), completas en `fila` (jsonb, texto). Un lote por carga.
+      - name: fed_raw
+        description: Filas de la tasa de fondos federales mensual (FRED, FEDFUNDS), completas en `fila` (jsonb, texto). Un lote por carga.
+      - name: cdt_raw
+        description: Filas de captación de CDT a 90 días (datos.gov.co), completas en `fila` (jsonb, texto). Un lote por carga.

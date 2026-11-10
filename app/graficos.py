@@ -210,3 +210,43 @@ def figura_tasa_real(filas, bandas, mostrar_bandas=True, tema="claro"):
     if mostrar_bandas:
         _bandas(fig, p, bandas, fechas)
     return fig
+
+
+def _serie(fig, p, filas, columna, nombre, color, eje="y", dash="solid", escalon=False, plantilla="%{y:,.2f} %"):
+    fig.add_trace(
+        go.Scatter(
+            x=[f["anio_mes"] for f in filas], y=[_num(f.get(columna)) for f in filas], name=nombre, yaxis=eje,
+            mode="lines", connectgaps=False,
+            line={"color": p[color], "width": 2, "dash": dash, "shape": "hv" if escalon else "linear"},
+            hovertemplate=plantilla + "<extra></extra>",
+        )
+    )
+
+
+def figura_trm_brent(filas, tema="claro"):
+    """TRM (eje izquierdo, COP) frente al Brent promedio mensual (eje derecho, USD por barril)."""
+    p = _paleta(tema)
+    filas = _ordenar(filas)
+    fechas = [f["anio_mes"] for f in filas]
+    fig = go.Figure(layout=_layout(p, 300))
+    _serie(fig, p, filas, "trm_promedio", "TRM promedio", "acento", plantilla="$ %{y:,.2f}")
+    _serie(fig, p, filas, "brent_promedio", "Brent promedio", "secundario", eje="y2", plantilla="USD %{y:,.2f}")
+    fig.update_layout(
+        xaxis=_eje_x(p, fechas),
+        yaxis=_eje_y(p, "COP", rejilla=True),
+        yaxis2={**_eje_y(p, "USD/barril", rejilla=False), "overlaying": "y", "side": "right"},
+    )
+    return fig
+
+
+def figura_credito(filas, tema="claro"):
+    """Tasa de intervención frente a la usura de consumo y al CDT a 90 días, en un solo eje (%)."""
+    p = _paleta(tema)
+    filas = _ordenar(filas)
+    fechas = [f["anio_mes"] for f in filas]
+    fig = go.Figure(layout=_layout(p, 300))
+    _serie(fig, p, filas, "tasa_vigente", "Tasa de intervención", "neutro500", dash="dash", escalon=True)
+    _serie(fig, p, filas, "tasa_usura_consumo", "Tasa de usura (consumo)", "secundario")
+    _serie(fig, p, filas, "tasa_cdt_90", "CDT a 90 días", "acento")
+    fig.update_layout(xaxis=_eje_x(p, fechas), yaxis={**_eje_y(p, "%", rejilla=True), "rangemode": "tozero"})
+    return fig

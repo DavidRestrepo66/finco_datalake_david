@@ -73,3 +73,38 @@ def test_csv_nueva_carga_crea_lote_nuevo_sin_tocar_el_anterior(conn):
     lote2 = cargar_csv(conn, "tasa_intervencion", filas, meta)
     assert lote2 != lote1
     assert conn.execute("select * from bronze.tasa_intervencion_raw where lote_id = %s", (lote1,)).fetchall() == antes
+
+
+def test_primera_carga_pide_todo_desde_2020():
+    from ingesta.carga_bronze import desde_incremental
+
+    assert desde_incremental(None) == "2020-01-01"
+
+
+def test_carga_incremental_retrocede_el_margen_desde_la_ultima_vigencia():
+    import datetime as dt
+
+    from ingesta.carga_bronze import MARGEN_DIAS, desde_incremental
+
+    assert desde_incremental(dt.date(2026, 10, 23)) == (dt.date(2026, 10, 23) - dt.timedelta(days=MARGEN_DIAS)).isoformat()
+    assert desde_incremental(dt.date(2020, 1, 3)) == "2020-01-01"  # nunca antes de la fecha de inicio
+
+
+def test_ultima_vigencia_es_la_mayor_vigenciadesde_cargada(conn):
+    import datetime as dt
+
+    from ingesta.carga_bronze import ultima_vigencia
+
+    cargar_trm(conn, [{"valor": "1", "vigenciadesde": "2099-05-04T00:00:00.000", "vigenciahasta": "2099-05-04T00:00:00.000"}])
+    assert ultima_vigencia(conn) == dt.date(2099, 5, 4)
+
+
+def test_fuente_api_en_bronze_guarda_la_fila_completa_con_lote_y_fuente(conn):
+    from ingesta.carga_bronze import cargar_api
+
+    filas = [{"observation_date": "2020-01-01", "FEDFUNDS": "1.55"}]
+    lote = cargar_api(conn, "fed", filas, "fred.stlouisfed.org/FEDFUNDS")
+    fila = conn.execute(
+        "select fuente, lote_id, fila from bronze.fed_raw where lote_id = %s", (lote,)
+    ).fetchone()
+    assert fila == ("fred.stlouisfed.org/FEDFUNDS", lote, filas[0])

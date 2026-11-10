@@ -13,6 +13,23 @@ docker compose run --rm pipeline          # ingesta de TRM, IPC y tasa + dbt bui
 docker compose --profile app up app       # app web: http://localhost:8501
 ```
 
+La TRM se carga de forma incremental: cada corrida pide a datos.gov.co solo desde la última vigencia ya cargada
+(menos 7 días de margen para recoger correcciones). La primera corrida trae todo desde 2020. Para forzar la
+carga completa: `python -m ingesta.carga_bronze trm --completo`.
+
+### Fuentes
+| Fuente | Origen | Carga |
+|---|---|---|
+| TRM | datos.gov.co (Socrata) | Incremental (`--completo` para todo) |
+| IPC y tasa de intervención | CSV del Banco de la República | Completa, a mano |
+| Tasa de usura | Superfinanciera, datos.gov.co `pare-7x5i` | Completa |
+| CDT a 90 días | Superfinanciera, datos.gov.co `axk9-g2nh` | Incremental (margen de 7 días) |
+| Brent y tasa de la Fed | FRED (CSV público, sin clave) | Completa |
+
+Cada una se carga con `python -m ingesta.carga_bronze usura | cdt | brent | fed`. El mart mensual suma las columnas
+`tasa_usura_consumo`, `tasa_cdt_90` (promedio ponderado por monto), `brent_promedio` y `fed_funds`; la página Análisis
+muestra TRM frente a Brent, y la tasa de intervención frente a la usura y al CDT.
+
 ### Qué se obtiene
 - **Tablero (Metabase):** http://localhost:3000, tablero «Tablero macroeconómico» con filtro de fechas.
   Se crea automáticamente al final del pipeline (`metabase/tablero.py`, con `METABASE_ADMIN_EMAIL` y
@@ -53,7 +70,7 @@ Ver `docs/diseno/arquitectura.md` (lakehouse híbrido: bronze en Parquet y Postg
 ### Estructura
 | Ruta | Contenido |
 |---|---|
-| `ingesta/` | Extractor TRM y cargador de CSV a bronze |
+| `ingesta/` | Extractores (TRM, usura, CDT, Brent y Fed) y cargador de CSV a bronze |
 | `data/fuentes/` | CSV de IPC y tasa del Banco de la República |
 | `dbt/` | Modelos silver y gold, pruebas y linaje |
 | `metabase/` | Script que crea el tablero por la API |

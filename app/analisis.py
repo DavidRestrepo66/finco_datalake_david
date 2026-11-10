@@ -298,3 +298,53 @@ def atajos(meses):
     if de_2023:
         resultado["2023"] = (de_2023[0], de_2023[-1])
     return resultado
+
+
+# --- Nuevas fuentes: Brent, usura y CDT (columnas opcionales del mart) ---
+
+COLUMNAS_FACTORES = ("brent_promedio", "tasa_usura_consumo")
+
+
+def factores(filas):
+    """Relaciones con las fuentes nuevas, o None si el mart no las trae o no hay datos.
+
+    correlacion_trm_brent: Pearson entre la TRM y el Brent de los meses que tienen ambos (None con menos de 3).
+    usura_ultima y spread_usura_tasa (usura menos tasa de intervención, en pp): último mes con ambas tasas.
+    """
+    if not filas or not all(c in filas[0] for c in COLUMNAS_FACTORES):
+        return None
+    con_brent = [f for f in sorted(filas, key=lambda f: f["anio_mes"]) if None not in (f["trm_promedio"], f["brent_promedio"])]
+    con_usura = [f for f in sorted(filas, key=lambda f: f["anio_mes"]) if None not in (f["tasa_usura_consumo"], f["tasa_vigente"])]
+    if not con_brent and not con_usura:
+        return None
+    ultima = con_usura[-1] if con_usura else None
+    return {
+        "correlacion_trm_brent": _correlacion(
+            [float(f["trm_promedio"]) for f in con_brent], [float(f["brent_promedio"]) for f in con_brent]
+        ),
+        "usura_ultima": float(ultima["tasa_usura_consumo"]) if ultima else None,
+        "spread_usura_tasa": float(ultima["tasa_usura_consumo"]) - float(ultima["tasa_vigente"]) if ultima else None,
+    }
+
+
+def lectura_factores(filas):
+    """Frases sobre la TRM frente al Brent y la usura frente a la tasa de intervención; [] si no hay datos."""
+    f = factores(filas)
+    if f is None:
+        return []
+    textos = []
+    r = f["correlacion_trm_brent"]
+    if r is None:
+        textos.append("No hay meses suficientes (o variación) para medir la relación entre la TRM y el Brent.")
+    else:
+        fuerza = "fuerte" if abs(r) >= 0.7 else "moderada" if abs(r) >= 0.4 else "débil"
+        textos.append(
+            f"La correlación entre la TRM y el Brent es {fuerza} y {'positiva' if r >= 0 else 'negativa'} "
+            f"(r = {_num(r, 2)}); correlación no implica causalidad."
+        )
+    if f["usura_ultima"] is not None:
+        textos.append(
+            f"La tasa de usura de consumo y ordinario es {porcentaje(f['usura_ultima'])}, "
+            f"{_num(f['spread_usura_tasa'])} puntos por encima de la tasa de intervención."
+        )
+    return textos

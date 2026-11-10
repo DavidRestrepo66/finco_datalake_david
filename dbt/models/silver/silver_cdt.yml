@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: silver_cdt
+    description: >
+      Tasa de captación de CDT a 90 días (Superfinanciera) por entidad y fecha de corte, con el monto
+      captado. Un día repetido de una entidad en varios lotes conserva el lote más reciente.
+    columns:
+      - name: fecha
+        description: Fecha de corte.
+        data_tests: [not_null]
+      - name: entidad
+        description: Nombre de la entidad financiera.
+      - name: tasa
+        description: Tasa de captación, en porcentaje.
+        data_tests: [not_null]
+      - name: monto
+        description: Monto captado (peso de la tasa en el promedio ponderado).
+        data_tests: [not_null]
+
+unit_tests:
+  - name: cdt_tipa_y_gana_el_lote_mas_reciente
+    description: La fila se tipa y, si una entidad repite el día en dos lotes, queda la del lote más reciente.
+    model: silver_cdt
+    given:
+      - input: source('bronze', 'cdt_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"tipoentidad": "1", "codigoentidad": "52", "nombreentidad": "Bancamía S.A.", "subcuenta": "70", "fechacorte": "2026-10-30T00:00:00.000", "tasa": "10.00", "monto": "100"}'}
+          - {id: 2, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00", fila: '{"tipoentidad": "1", "codigoentidad": "52", "nombreentidad": "Bancamía S.A.", "subcuenta": "70", "fechacorte": "2026-10-30T00:00:00.000", "tasa": "10.50", "monto": "120"}'}
+    expect:
+      rows:
+        - {fecha: "2026-10-30", tipo_entidad: "1", codigo_entidad: "52", entidad: "Bancamía S.A.", subcuenta: "70", tasa: "10.50", monto: 120, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00"}
