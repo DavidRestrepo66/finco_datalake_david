@@ -7,3 +7,6 @@ dbt/logs/
 data/bronze/
 dbt/.user.yml
 .engram/
+
+# Seguimiento de trabajo (ODD): solo local
+odd/
