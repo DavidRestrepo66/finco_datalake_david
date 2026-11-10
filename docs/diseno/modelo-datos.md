@@ -10,20 +10,28 @@ erDiagram
     SILVER_TRM { date fecha numeric valor date vigencia_desde date vigencia_hasta uuid lote_id }
     SILVER_IPC { date mes numeric indice }
     SILVER_TASA { date fecha_inicio date fecha_fin numeric tasa }
+    SILVER_USURA { text modalidad date vigencia_desde date vigencia_hasta numeric tasa_usura }
+    SILVER_CDT { text entidad date fecha numeric tasa numeric monto }
+    SILVER_BRENT { date fecha numeric brent }
+    SILVER_FED { date mes numeric fed_funds }
     DIM_FECHA { date fecha int anio int mes date anio_mes }
     FACT_TRM_DIARIA { date fecha numeric valor }
-    FACT_INDICADORES_MENSUAL { date anio_mes numeric ipc numeric inflacion_anual numeric tasa_vigente }
-    MART_MENSUAL { date anio_mes numeric trm_promedio numeric ipc numeric tasa_vigente }
+    FACT_INDICADORES_MENSUAL { date anio_mes numeric ipc numeric inflacion_anual numeric tasa_vigente numeric tasa_usura_consumo numeric brent_promedio numeric fed_funds numeric tasa_cdt_90 }
+    MART_MENSUAL { date anio_mes numeric trm_promedio numeric ipc numeric tasa_vigente numeric tasa_usura_consumo numeric brent_promedio numeric fed_funds numeric tasa_cdt_90 }
     BRONZE_TRM_RAW ||--o{ SILVER_TRM : dbt
     BRONZE_IPC_RAW ||--o{ SILVER_IPC : dbt
     BRONZE_TASA_RAW ||--o{ SILVER_TASA : dbt
+    SILVER_USURA ||--o{ FACT_INDICADORES_MENSUAL : vigencia
+    SILVER_CDT ||--o{ FACT_INDICADORES_MENSUAL : ponderado_por_monto
+    SILVER_BRENT ||--o{ FACT_INDICADORES_MENSUAL : promedio_mensual
+    SILVER_FED ||--o{ FACT_INDICADORES_MENSUAL : mes
     DIM_FECHA ||--o{ FACT_TRM_DIARIA : fecha
     DIM_FECHA ||--o{ FACT_INDICADORES_MENSUAL : anio_mes
     FACT_TRM_DIARIA ||--o{ MART_MENSUAL : promedio
     FACT_INDICADORES_MENSUAL ||--|| MART_MENSUAL : anio_mes
 ```
 
-Todas las tablas del diagrama están implementadas (`bronze`, `silver` y `gold`, ver `dbt/models/`). Las columnas del diagrama son ilustrativas; las definitivas están en los `.yml` de dbt.
+Todas las tablas del diagrama están implementadas (`bronze`, `silver` y `gold`, ver `dbt/models/`). Las columnas del diagrama son ilustrativas; las definitivas están en los `.yml` de dbt. Las fuentes nuevas (usura y CDT a 90 días de la Superfinanciera vía Socrata; Brent y tasa de la Fed vía FRED) tienen su bronze `*_raw` y su silver (`silver_usura`, `silver_cdt`, `silver_brent`, `silver_fed`) y alimentan `fact_indicadores_mensual` y el mart; sus bronze se omiten del diagrama por brevedad.
 
 ## 2. ADR-01 Periodicidad mixta: Opción B (D-03)
 

@@ -1,6 +1,6 @@
 # Datos financieros públicos (finco_datalake)
 
-Lakehouse analítico que consolida indicadores macroeconómicos colombianos públicos (TRM, IPC y tasa de intervención) en capas, para compararlos en un tablero.
+Lakehouse analítico que consolida indicadores macroeconómicos públicos (TRM, IPC, tasa de intervención, tasa de usura, CDT a 90 días, Brent y tasa de la Fed) en capas, para compararlos en un tablero y una app de consulta.
 
 ## Language
 
@@ -32,6 +32,26 @@ _Avoid_: Inflación (la inflación es lo que se deriva del IPC)
 Tasa de política monetaria fijada por la Junta del Banco de la República; cambia solo cuando la Junta decide.
 _Avoid_: Tasa de interés, tasa repo
 
+**Tasa de usura**:
+Tasa máxima legal para el crédito de consumo, certificada por la Superintendencia Financiera; se publica por vigencia.
+_Avoid_: Tasa máxima, interés de usura
+
+**CDT a 90 días**:
+Tasa de captación de los certificados de depósito a término a 90 días, publicada por la Superfinanciera; en el mart se pondera por monto captado (`tasa_cdt_90`).
+_Avoid_: DTF
+
+**Brent**:
+Precio del barril de petróleo Brent en USD, tomado de FRED; en el mart aparece como promedio mensual (`brent_promedio`).
+_Avoid_: Petróleo, WTI
+
+**Tasa de la Fed**:
+Tasa efectiva de fondos federales de Estados Unidos, tomada de FRED (`fed_funds`).
+_Avoid_: Tasa americana
+
+**FRED**:
+API pública de la Reserva Federal de St. Louis, fuente del Brent y de la tasa de la Fed (`ingesta/extractores/fred.py`).
+_Avoid_: Reserva Federal (la fuente es la API, no la entidad)
+
 **Vigencia**:
 Periodo (`fecha_inicio` a `fecha_fin`) durante el cual un valor rigió. Aplica a la TRM (fines de semana y festivos repiten el valor del último día hábil) y a la tasa de intervención (las vigencias no se solapan).
 _Avoid_: Periodo de validez
@@ -45,7 +65,7 @@ Archivo descargado a mano del Banco de la República y versionado en el reposito
 _Avoid_: Extractor del Banco
 
 **Mart mensual**:
-Tabla de gold con una fila por mes que consolida la TRM promedio, el IPC y la tasa de intervención vigente.
+Tabla de gold con una fila por mes que consolida la TRM promedio, el IPC, la inflación anual, la tasa de intervención vigente, la tasa de usura de consumo, el Brent promedio, la tasa de la Fed y el CDT a 90 días.
 _Avoid_: Vista consolidada, cubo
 
 **Evaluador**:

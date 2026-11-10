@@ -9,6 +9,8 @@ Para cada funcionalidad clave hay un diagrama de secuencia (orden temporal) y un
 
 ## 1. Ejecutar el pipeline con ingesta de la TRM (CU-02, CU-03)
 
+> El diagrama detalla la TRM. Las etapas de usura y CDT usan el mismo flujo vía el extractor Socrata genérico, y Brent y Fed lo usan vía `fred.py` (FRED), todas entre la ingesta de la tasa y `dbt build`.
+
 ### Secuencia
 
 ```mermaid

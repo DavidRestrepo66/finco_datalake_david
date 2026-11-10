@@ -5,7 +5,8 @@ Lakehouse híbrido: bronze se escribe como Parquet inmutable por lote (el lake, 
 ```mermaid
 flowchart LR
     subgraph Fuentes
-        S1[API Socrata datos.gov.co: TRM]
+        S1[API Socrata datos.gov.co: TRM, usura, CDT 90 días]
+        S4[API FRED: Brent y tasa de la Fed]
         S2[CSV IPC versionado]
         S3[CSV tasa de intervención versionado]
     end
@@ -19,6 +20,7 @@ flowchart LR
     S1 --> PIPE
     S2 --> PIPE
     S3 --> PIPE
+    S4 --> PIPE
     PIPE --> LAKE
     PIPE --> PG
     PG --> MB
@@ -27,12 +29,12 @@ flowchart LR
 
 | Componente | Tecnología | Servicio Compose | Responsabilidad |
 |---|---|---|---|
-| Ingesta | Python (`ingesta/`) | `pipeline` | Extraer TRM, cargar CSV, escribir Parquet y `bronze.*_raw` |
+| Ingesta | Python (`ingesta/`) | `pipeline` | Extraer de Socrata (TRM, usura, CDT) y FRED (Brent, Fed), cargar CSV, escribir Parquet y `bronze.*_raw`; la TRM es incremental (`--completo` fuerza recarga) |
 | Transformación | dbt Core (`dbt/`) | `pipeline` | Construir silver y gold, ejecutar pruebas |
 | Almacenamiento | PostgreSQL 16 | `postgres` | Esquemas `bronze`, `silver`, `gold` |
 | Lake | Parquet en `data/bronze/` | volumen `./data` | Datos crudos inmutables por lote |
 | Tablero | Metabase | `metabase` | HU-13, creado por script contra su API |
-| Consulta y descarga | Streamlit (`app/`) | `app` (perfil `app`) | HU-14, lee gold |
+| Consulta y descarga | Streamlit (`app/`) | `app` (perfil `app`) | HU-14, lee gold; páginas Inicio, Análisis, Datos y Calidad y linaje |
 
 Puertos y credenciales salen de `.env` (copia de `.env.example`).
 
@@ -43,7 +45,7 @@ Puertos y credenciales salen de `.env` (copia de `.env.example`).
 ```mermaid
 flowchart LR
     subgraph Origen
-        A1[API Socrata]
+        A1[API Socrata y FRED]
         A2[CSV Banco de la República]
     end
     subgraph Lake[Lake: archivos]
@@ -83,7 +85,7 @@ flowchart TB
         V1[(volumen pgdata)]
         V2[(carpeta data/ montada)]
     end
-    INET[(Internet: API Socrata)]
+    INET[(Internet: API Socrata y FRED)]
     P --- V1
     PIPE --- V2
     PIPE --> P
@@ -117,6 +119,6 @@ flowchart TB
 
 ### Riesgos y limitaciones
 
-- La TRM depende de una API externa; los reintentos mitigan fallas pasajeras, no una caída prolongada.
+- La TRM, la usura, el CDT, el Brent y la Fed dependen de APIs externas (Socrata y FRED); los reintentos mitigan fallas pasajeras, no una caída prolongada.
 - IPC y tasa se descargan a mano; su automatización queda como trabajo futuro.
 - No hay integración continua (R-01); la verificación es local con `verificar.py`.

@@ -182,34 +182,32 @@ El proyecto sigue Scrum, así que las fases no son secuenciales en cascada: se s
 ```
 lakehouse-financiero/
 ├── README.md                  # Cómo levantar y ejecutar todo (para el evaluador)
-├── docker-compose.yml         # PostgreSQL + Metabase (+ contenedor de ingesta/dbt si aplica)
+├── docker-compose.yml         # PostgreSQL + Metabase + app Streamlit (perfil app)
 ├── .env.example               # Variables de entorno sin secretos reales
-├── pipeline.py                # Comando único: ingesta → dbt build (RF-08)
+├── pipeline.py                # Comando único: ingesta (TRM, IPC, tasa, usura, Brent, Fed, CDT) → dbt build → tablero (RF-08)
 ├── verificar.py               # Verificación local antes de cada PR (sección 7.1)
-├── data/fuentes/             # CSV del Banco de la República (IPC y tasa), versionados (D-10)
+├── data/fuentes/              # CSV del Banco de la República (IPC y tasa), versionados (D-10)
 ├── ingesta/
 │   ├── extractores/
-│   │   ├── trm_socrata.py
-│   │   └── banrep.py          # Lector de los CSV de IPC y tasa de intervención
+│   │   ├── trm_socrata.py     # Extractor Socrata genérico (TRM, usura, CDT; carga incremental con --completo)
+│   │   ├── banrep.py          # Lector de los CSV de IPC y tasa de intervención
+│   │   └── fred.py            # Extractor FRED (Brent y tasa de la Fed)
 │   ├── carga_bronze.py
 │   └── tests/                 # pytest
 ├── dbt/
 │   ├── dbt_project.yml
 │   ├── models/
-│   │   ├── silver/
-│   │   └── gold/
+│   │   ├── silver/            # trm, ipc, tasa_intervencion, usura, brent, fed, cdt
+│   │   └── gold/              # dim_fecha, fact_trm_diaria, fact_indicadores_mensual, mart_mensual
 │   └── tests/
-├── metabase/                  # Respaldo/instrucciones del tablero
+├── app/                       # App Streamlit de consulta (HU-14): ui.py + páginas Inicio, Análisis, Datos, Calidad y linaje
+├── metabase/                  # Creación del tablero (tablero.py)
 └── docs/
-    ├── requisitos.md
-    ├── historias-usuario.md
-    ├── casos-uso.md
-    ├── diagramas/             # Mermaid o imágenes exportadas
-    ├── adr/                   # Registros de decisiones de arquitectura
-    ├── actas/                 # sprint-1.md ... sprint-4.md
+    ├── analisis/              # requisitos.md, historias-usuario.md, fuentes-candidatas.md
+    ├── diseno/                # arquitectura, modelo de datos y diagramas UML
+    ├── gestion/               # trazabilidad.md, versionado.md, actas-retrospectiva.md
     ├── pruebas/               # plan, casos y evidencia
-    ├── trazabilidad.md
-    └── manuales/
+    └── manuales/              # manual técnico y de usuario
 ```
 
 ### 6.2 Estrategia de ramas recomendada: GitHub Flow simplificado
@@ -535,85 +533,85 @@ Cada ejecución se registra en `docs/pruebas/evidencia/` con fecha, quién la ej
 ### Semana 2 (28 sep – 4 oct) — cierre del sprint 1
 
 **Todos**
-- [ ] Leer este documento y el documento base; anotar desacuerdos.
-- [ ] Revisar y numerar los requisitos RF/RNF (T-01).
-- [ ] Revisar las HU de la sección 8; David las prioriza como PO.
+- [x] Leer este documento y el documento base; anotar desacuerdos.
+- [x] Revisar y numerar los requisitos RF/RNF (T-01) — `docs/analisis/requisitos.md`.
+- [x] Revisar las HU de la sección 8; David las prioriza como PO — `docs/analisis/historias-usuario.md`.
 
 **David**
-- [ ] Probar la API Socrata de TRM: identificar el dataset, paginación y filtro por fecha desde 2020.
-- [ ] Confirmar el formato de descarga del IPC y de la tasa de intervención en el Banco de la República (URL, formato, frecuencia).
-- [ ] Registrar los hallazgos en `docs/fuentes.md`.
+- [x] Probar la API Socrata de TRM: identificar el dataset, paginación y filtro por fecha desde 2020.
+- [x] Confirmar el formato de descarga del IPC y de la tasa de intervención en el Banco de la República (URL, formato, frecuencia) — `data/fuentes/`.
+- [x] Registrar los hallazgos (quedaron en el manual y en `docs/analisis/fuentes-candidatas.md`).
 
 **Juan Esteban**
-- [ ] Instalar dbt Core con el adaptador de PostgreSQL y completar el tutorial básico.
-- [ ] Redactar el ADR de la Opción B (plantilla 15.7).
+- [x] Instalar dbt Core con el adaptador de PostgreSQL y completar el tutorial básico.
+- [ ] Redactar el ADR de la Opción B (plantilla 15.7) — sin ADR formal; la decisión quedó en `docs/diseno/arquitectura.md`.
 
 **Andrey**
-- [ ] Crear el repositorio con la estructura 6.1, proteger `main` y configurar GitHub Projects (6.4).
-- [ ] Cargar épicas e HU como issues.
-- [ ] Redactar el acta del sprint 1 (plantilla 15.3).
+- [x] Crear el repositorio con la estructura 6.1, proteger `main` y configurar GitHub Projects (6.4).
+- [x] Cargar épicas e HU como issues.
+- [x] Redactar el acta del sprint 1 — `docs/gestion/actas-retrospectiva.md`.
 
 ### Semana 3 (5 – 11 oct)
 
 **David**
-- [ ] HU-03: extractor de TRM hacia bronze, con pruebas CP-ING-01.
-- [ ] Iniciar HU-04: extractor de IPC.
-- [ ] T-02: casos de uso CU-01 a CU-05.
+- [x] HU-03: extractor de TRM hacia bronze, con pruebas CP-ING-01 — `ingesta/extractores/trm_socrata.py`.
+- [x] Iniciar HU-04: extractor de IPC — `ingesta/extractores/banrep.py`.
+- [x] T-02: casos de uso CU-01 a CU-05 — `docs/diseno/casos-uso.md`.
 
 **Juan Esteban**
-- [ ] T-04: ER de bronze/silver/gold.
-- [ ] Inicializar el proyecto dbt y declarar las fuentes (`sources`) apuntando a bronze.
+- [x] T-04: ER de bronze/silver/gold — `docs/diseno/modelo-datos.md`.
+- [x] Inicializar el proyecto dbt y declarar las fuentes (`sources`) apuntando a bronze — `dbt/models/sources.yml`.
 
 **Andrey**
-- [ ] HU-01: Docker Compose con PostgreSQL (esquemas creados) y Metabase. **Prioridad de la semana: bloquea a los demás.**
-- [ ] T-03: diagrama de arquitectura/componentes.
-- [ ] Crear `verificar.py` (sección 7.1).
+- [x] HU-01: Docker Compose con PostgreSQL (esquemas creados) y Metabase. **Prioridad de la semana: bloquea a los demás.**
+- [x] T-03: diagrama de arquitectura/componentes — `docs/diseno/arquitectura.md`.
+- [x] Crear `verificar.py` (sección 7.1).
 
 ### Semana 4 (12 – 18 oct) — ENTREGA DE MITAD
 
 **David**
-- [ ] HU-04 y HU-05: extractores del Banco de la República.
-- [ ] HU-06: reintentos y registro de errores, con CP-ING-02.
-- [ ] T-02: diagramas de flujo de la ingesta.
+- [x] HU-04 y HU-05: extractores del Banco de la República — `ingesta/extractores/banrep.py`.
+- [x] HU-06: reintentos y registro de errores, con CP-ING-02 — reintentos en `trm_socrata.py` y `fred.py`.
+- [x] T-02: diagramas de flujo de la ingesta — `docs/diseno/actividades.md`.
 
 **Juan Esteban**
-- [ ] Revisar y aceptar las HU de ingesta (regla 5.2).
-- [ ] Opcional para ganar margen: primer modelo staging de TRM en silver.
+- [x] Revisar y aceptar las HU de ingesta (regla 5.2).
+- [x] Opcional para ganar margen: primer modelo staging de TRM en silver — `dbt/models/silver/silver_trm.sql`.
 
 **Andrey**
-- [ ] T-05: matriz de trazabilidad v1 (sección 11 con PR reales).
-- [ ] Actas de los sprints 1 y 2.
-- [ ] Ensamblar el documento de la entrega de mitad.
+- [x] T-05: matriz de trazabilidad v1 (sección 11 con PR reales) — `docs/gestion/trazabilidad.md`.
+- [x] Actas de los sprints 1 y 2 — `docs/gestion/actas-retrospectiva.md`.
+- [x] Ensamblar el documento de la entrega de mitad — `entregables/entregable-1/`.
 
 **Todos**
-- [ ] Review + retrospectiva del sprint 2 y planning del sprint 3.
+- [x] Review + retrospectiva del sprint 2 y planning del sprint 3.
 
 ### Semana 5 (19 – 25 oct)
 
-- [ ] **Juan Esteban:** HU-07 (TRM en silver) y HU-08 (IPC y tasa por vigencia) con tests.
-- [ ] **Juan Esteban:** T-06 plan de pruebas y casos de prueba.
-- [ ] **David:** ajustes de ingesta según lo que necesite silver; aceptar las HU de silver.
-- [ ] **Andrey:** primera versión de `pipeline.py` (solo ingesta); medir duración.
+- [x] **Juan Esteban:** HU-07 (TRM en silver) y HU-08 (IPC y tasa por vigencia) con tests — `dbt/models/silver/`.
+- [x] **Juan Esteban:** T-06 plan de pruebas y casos de prueba — `docs/pruebas/plan-pruebas.md`.
+- [x] **David:** ajustes de ingesta según lo que necesite silver; aceptar las HU de silver.
+- [x] **Andrey:** primera versión de `pipeline.py` (solo ingesta); medir duración.
 
 ### Semana 6 (26 oct – 1 nov)
 
-- [ ] **Juan Esteban:** HU-09 (gold, Opción B) y HU-10 (integridad referencial).
-- [ ] **Juan Esteban:** HU-11 (descripciones de columnas y `dbt docs`).
-- [ ] **Andrey:** HU-12 `pipeline.py` completo (ingesta → `dbt build`); definir el umbral de RNF-02.
-- [ ] **David:** actualizar diagramas si el diseño cambió.
-- [ ] **Todos:** review + retro del sprint 3 y planning del sprint 4.
+- [x] **Juan Esteban:** HU-09 (gold, Opción B) y HU-10 (integridad referencial) — `dbt/models/gold/`.
+- [x] **Juan Esteban:** HU-11 (descripciones de columnas y `dbt docs`) — `dbt/models/*/*.yml`.
+- [x] **Andrey:** HU-12 `pipeline.py` completo (ingesta → `dbt build`); definir el umbral de RNF-02.
+- [ ] **David:** actualizar diagramas si el diseño cambió — pendiente: los diagramas de `docs/diseno/` aún no reflejan las fuentes nuevas.
+- [x] **Todos:** review + retro del sprint 3 y planning del sprint 4.
 
 ### Semana 7 (2 – 8 nov)
 
-- [ ] **Andrey:** HU-13 tablero en Metabase conectado a gold.
-- [ ] **Andrey:** T-08 manual técnico y manual de usuario.
-- [ ] **Juan Esteban:** coordinar T-07; ejecutar las pruebas de calidad y documentar la evidencia.
-- [ ] **David:** ejecutar las pruebas de ingesta e integración; aceptar HU-12 y HU-13 como PO.
+- [x] **Andrey:** HU-13 tablero en Metabase conectado a gold — `metabase/tablero.py`, etapa final de `pipeline.py`.
+- [x] **Andrey:** T-08 manual técnico y manual de usuario — `docs/manuales/manual.md`.
+- [x] **Juan Esteban:** coordinar T-07; ejecutar las pruebas de calidad y documentar la evidencia — `docs/pruebas/evidencia/`.
+- [x] **David:** ejecutar las pruebas de ingesta e integración; aceptar HU-12 y HU-13 como PO.
 
 ### Semana 8 (9 – 15 nov) — ENTREGA FINAL
 
-- [ ] **Andrey:** HU-02 prueba de instalación en máquina limpia (ejecutada por otro integrante).
-- [ ] **Andrey:** trazabilidad final y actas de los sprints 3 y 4.
+- [x] **Andrey:** HU-02 prueba de instalación en máquina limpia (ejecutada por otro integrante) — `docs/pruebas/evidencia/ejecucion-2026-10-30-instalacion-limpia.md`.
+- [ ] **Andrey:** trazabilidad final y actas de los sprints 3 y 4 — trazabilidad v1 hecha; falta la versión final tras el merge de `feat/nuevas-fuentes`.
 - [ ] **Todos:** retrospectiva general y sección "trabajo futuro".
 - [ ] **Todos:** ensamblar el documento final y ensayar la demo (cada uno su parte, ver D-06).
 

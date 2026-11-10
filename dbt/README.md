@@ -14,8 +14,16 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 | Modelo | Tabla | Regla |
 |---|---|---|
 | `silver_trm` | `silver.trm` | Una fila por día calendario. Cada vigencia de bronze se expande a sus días; si un día está en dos lotes gana el más reciente (HU-07). |
+| `silver_ipc` | `silver.ipc` | IPC mensual limpio y tipado desde el CSV del Banco de la República (HU-08). |
+| `silver_tasa_intervencion` | `silver.tasa_intervencion` | Tasa de política por vigencia, sin solapamientos (HU-08). |
+| `silver_usura` | `silver.usura` | Tasa de usura de consumo (Superfinanciera vía Socrata), por vigencia (HU-15). |
+| `silver_cdt` | `silver.cdt` | Captaciones de CDT a 90 días (Superfinanciera vía Socrata), con tasa y monto (HU-16). |
+| `silver_brent` | `silver.brent` | Precio diario del Brent (FRED) limpio y tipado (HU-15). |
+| `silver_fed` | `silver.fed` | Tasa efectiva de la Fed (FRED) limpia y tipada (HU-15). |
 | `dim_fecha` | `gold.dim_fecha` | Un día calendario por fila, desde `fecha_inicio_dim` (2019-01-01) hasta el último día con TRM (HU-09). |
 | `fact_trm_diaria` | `gold.fact_trm_diaria` | Hecho diario de la TRM. `relationships` contra `dim_fecha`: falla e identifica fechas huérfanas (HU-10). |
+| `fact_indicadores_mensual` | `gold.fact_indicadores_mensual` | Hecho mensual: IPC, inflación anual, tasa vigente, usura, Brent promedio, Fed funds y CDT a 90 días ponderado por monto. |
+| `mart_mensual` | `gold.mart_mensual` | Una fila por mes: TRM promedio + todos los indicadores de `fact_indicadores_mensual`. |
 
 ## Linaje de datos (HU-11)
 
