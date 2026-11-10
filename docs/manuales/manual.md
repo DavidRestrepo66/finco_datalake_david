@@ -17,16 +17,39 @@ La TRM se carga de forma incremental: cada corrida pide a datos.gov.co solo desd
 (menos 7 días de margen para recoger correcciones). La primera corrida trae todo desde 2020. Para forzar la
 carga completa: `python -m ingesta.carga_bronze trm --completo`.
 
+### Fuentes
+| Fuente | Origen | Carga |
+|---|---|---|
+| TRM | datos.gov.co (Socrata) | Incremental (`--completo` para todo) |
+| IPC y tasa de intervención | CSV del Banco de la República | Completa, a mano |
+| Tasa de usura | Superfinanciera, datos.gov.co `pare-7x5i` | Completa |
+| CDT a 90 días | Superfinanciera, datos.gov.co `axk9-g2nh` | Incremental (margen de 7 días) |
+| Brent y tasa de la Fed | FRED (CSV público, sin clave) | Completa |
+
+Cada una se carga con `python -m ingesta.carga_bronze usura | cdt | brent | fed`. El mart mensual suma las columnas
+`tasa_usura_consumo`, `tasa_cdt_90` (promedio ponderado por monto), `brent_promedio` y `fed_funds`; la página Análisis
+muestra TRM frente a Brent, y la tasa de intervención frente a la usura y al CDT.
+
 ### Qué se obtiene
 - **Tablero (Metabase):** http://localhost:3000, tablero «Tablero macroeconómico» con filtro de fechas.
   Se crea automáticamente al final del pipeline (`metabase/tablero.py`, con `METABASE_ADMIN_EMAIL` y
   `METABASE_ADMIN_PASSWORD` de `.env`); si ya existe, no lo duplica.
-- **App web (Streamlit):** el rango de fechas se elige arriba y aplica a dos pestañas.
-  - *Consulta y descarga:* elegir conjunto (TRM diaria o mart mensual), ver la vista previa y descargar el CSV.
-    Si el rango no tiene datos, muestra un mensaje y no genera archivo.
-  - *Análisis:* sobre el mart mensual del rango, muestra variación de la TRM, inflación promedio, tasa vigente y
-    tasa real (tasa − inflación), gráficos de la TRM y de inflación frente a tasa, y una lectura en texto
-    generada desde los datos (máximo/mínimo de la TRM, correlación TRM–inflación). La correlación no implica causalidad.
+- **App web (Streamlit):** http://localhost:8501 (`docker compose --profile app up -d app`). La barra lateral tiene la
+  navegación numerada, el periodo global (atajos Último año / Desde 2020 / 2023 y Desde/Hasta por mes) y el
+  selector de tema Claro/Oscuro. Cuatro páginas:
+  - *01 Inicio:* presentación, datos de contexto (periodo cubierto y último dato salen de la base), indicadores del
+    periodo y el flujo de los datos.
+  - *02 Análisis:* KPI con variación frente al periodo anterior de igual longitud (la tasa real es la diferencia
+    simple tasa − inflación), gráfico de la TRM (eje izquierdo) frente a inflación y tasa (eje derecho) con bandas de
+    ciclos de subidas/recortes de la tasa, activables por serie, gráfico de tasa real y «Lectura del periodo» generada
+    desde los datos.
+  - *03 Datos:* elegir conjunto (mart mensual o TRM diaria), columnas visibles, vista previa de 12 filas y botón
+    «Descargar CSV» con exactamente las columnas visibles y las filas del periodo.
+  - *04 Calidad y linaje:* resultado de las pruebas dbt (filtrable por capa silver/gold), linaje de `mart_mensual`
+    y enlace a Metabase (`METABASE_URL`, por defecto http://localhost:3000). Lee `run_results.json` y `manifest.json`
+    de la carpeta `DBT_TARGET_DIR` (en Docker: `/app/dbt_target`, volumen `./dbt/target` de solo lectura en el servicio
+    `app`; el servicio `pipeline` monta `./dbt/target` para dejar ahí los artefactos de dbt). Si faltan, la página
+    explica cómo montarlos.
 - **Linaje:** `cd dbt && dbt docs generate --profiles-dir . && dbt docs serve --profiles-dir .`
 
 ### Solución de problemas
@@ -47,7 +70,7 @@ Ver `docs/diseno/arquitectura.md` (lakehouse híbrido: bronze en Parquet y Postg
 ### Estructura
 | Ruta | Contenido |
 |---|---|
-| `ingesta/` | Extractor TRM y cargador de CSV a bronze |
+| `ingesta/` | Extractores (TRM, usura, CDT, Brent y Fed) y cargador de CSV a bronze |
 | `data/fuentes/` | CSV de IPC y tasa del Banco de la República |
 | `dbt/` | Modelos silver y gold, pruebas y linaje |
 | `metabase/` | Script que crea el tablero por la API |

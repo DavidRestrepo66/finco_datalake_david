@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: silver_brent
+    description: >
+      Brent diario en dólares por barril (FRED, DCOILBRENTEU). Los días sin dato (cadena vacía
+      en bronze) se excluyen. Un día repetido en varios lotes conserva el lote más reciente.
+    columns:
+      - name: fecha
+        description: Día de la observación.
+        data_tests: [unique, not_null]
+      - name: brent
+        description: Precio del Brent en USD por barril.
+        data_tests: [not_null]
+      - name: lote_id
+        description: Lote de bronze del que viene el valor.
+      - name: cargado_en
+        description: Momento de carga del lote.
+
+unit_tests:
+  - name: brent_excluye_dias_vacios
+    description: Un día con cadena vacía no aparece; los demás se tipan a numérico.
+    model: silver_brent
+    given:
+      - input: source('bronze', 'brent_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"observation_date": "2020-01-01", "DCOILBRENTEU": ""}'}
+          - {id: 2, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"observation_date": "2020-01-02", "DCOILBRENTEU": "67.05"}'}
+    expect:
+      rows:
+        - {fecha: "2020-01-02", brent: 67.05, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00"}
+
+  - name: brent_gana_el_lote_mas_reciente
+    description: Un día repetido en dos lotes toma el valor del lote más reciente.
+    model: silver_brent
+    given:
+      - input: source('bronze', 'brent_raw')
+        rows:
+          - {id: 1, lote_id: "00000000-0000-0000-0000-00000000000a", cargado_en: "2026-10-01 00:00:00+00", fila: '{"observation_date": "2020-01-02", "DCOILBRENTEU": "60.00"}'}
+          - {id: 2, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00", fila: '{"observation_date": "2020-01-02", "DCOILBRENTEU": "67.05"}'}
+    expect:
+      rows:
+        - {fecha: "2020-01-02", brent: 67.05, lote_id: "00000000-0000-0000-0000-00000000000b", cargado_en: "2026-10-02 00:00:00+00"}

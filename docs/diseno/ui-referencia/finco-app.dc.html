@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="_ds/modernist-14cd3ab3-c7cc-47d4-a06b-00ef2462275c/styles.css">
+<script src="_ds/modernist-14cd3ab3-c7cc-47d4-a06b-00ef2462275c/_ds_bundle.js"></script>
+<style>
+body { margin: 0; }
+a { color: var(--color-accent-700); }
+a:hover { color: var(--color-accent); }
+[data-theme="dark"] {
+  --color-bg: #161514; --color-surface: #211f1e; --color-text: #eceaea;
+  --color-divider: color-mix(in srgb, #eceaea 32%, transparent);
+  --color-accent: #ff563c; --color-accent-600: #ff6d55; --color-accent-700: #ff9a88;
+  --color-accent-100: #3b1a13; --color-accent-800: #ffc2b6;
+  --color-neutral-100: #2a2827; --color-neutral-200: #2f2c2b; --color-neutral-500: #8f8a8a; --color-neutral-700: #bab6b6; --color-neutral-800: #d7d3d3;
+}
+[data-theme="dark"] a { color: var(--color-accent-700); }
+.seg-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+</style>
+</helmet>
+<div data-theme="{{ themeName }}" style="min-height: 100vh; display: flex; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: 15px; line-height: 1.5;">
+
+  <aside data-screen-label="Barra lateral" style="width: 272px; flex: none; border-right: 2px solid var(--color-divider); display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-6) var(--space-4); box-sizing: border-box; position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--color-surface);">
+    <div style="display: flex; align-items: center; gap: var(--space-2);">
+      <div style="width: 14px; height: 14px; background: var(--color-accent);"></div>
+      <div style="font-family: var(--font-heading); font-weight: 800; font-size: 22px; letter-spacing: -0.01em;">Finco</div>
+    </div>
+
+    <nav style="display: flex; flex-direction: column; border-top: 2px solid var(--color-divider);">
+      <sc-for list="{{ nav }}" as="it" hint-placeholder-count="4">
+        <button onClick="{{ it.go }}" style="display: flex; align-items: baseline; gap: var(--space-3); text-align: left; padding: 10px var(--space-2); border: 0; border-bottom: 1px solid var(--color-divider); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; background: {{ it.bg }}; color: {{ it.fg }};">
+          <span style="font-size: 11px; font-weight: 500; opacity: 0.7; font-variant-numeric: tabular-nums;">{{ it.num }}</span>
+          <span>{{ it.label }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <section style="display: flex; flex-direction: column; gap: var(--space-3);">
+      <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); font-weight: 600;">Periodo · todas las páginas</div>
+      <div class="seg" style="display: flex;">
+        <sc-for list="{{ shortcuts }}" as="s" hint-placeholder-count="3">
+          <label class="seg-opt" style="flex: 1; justify-content: flex-start; padding: 7px 8px; font-size: 12px;">
+            <input type="radio" name="atajo" checked="{{ s.on }}" onChange="{{ s.pick }}">{{ s.label }}
+          </label>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+        <div class="field">
+          <label>Desde</label>
+          <select class="input" value="{{ startVal }}" onChange="{{ onStart }}" style="padding: 6px; font-size: 13px;">
+            <sc-for list="{{ monthOpts }}" as="o"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+          </select>
+        </div>
+        <div class="field">
+          <label>Hasta</label>
+          <select class="input" value="{{ endVal }}" onChange="{{ onEnd }}" style="padding: 6px; font-size: 13px;">
+            <sc-for list="{{ monthOpts }}" as="o"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+          </select>
+        </div>
+      </div>
+      <div style="font-size: 12px; color: var(--color-neutral-700);">{{ rangeCaption }}</div>
+    </section>
+
+    <section style="margin-top: auto; display: flex; flex-direction: column; gap: var(--space-2);">
+      <div style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-neutral-700); font-weight: 600;">Tema</div>
+      <div class="seg" style="display: flex;">
+        <label class="seg-opt" style="flex: 1;"><input type="radio" name="tema" checked="{{ isLight }}" onChange="{{ setLight }}">Claro</label>
+        <label class="seg-opt" style="flex: 1;"><input type="radio" name="tema" checked="{{ isDark }}" onChange="{{ setDark }}">Oscuro</label>
+      </div>
+      <div style="font-size: 11px; color: var(--color-neutral-700);">Maqueta con datos ficticios.</div>
+    </section>
+  </aside>
+
+  <main style="flex: 1; min-width: 0; padding: var(--space-8) clamp(16px, 4vw, 56px) 64px; box-sizing: border-box; display: flex; flex-direction: column; gap: var(--space-8); max-width: 1240px;">
+
+    <sc-if value="{{ isInicio }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="01 Inicio" style="display: flex; flex-direction: column; gap: var(--space-8);">
+        <header style="display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-6); border-bottom: 2px solid var(--color-divider);">
+          <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); font-weight: 600;">Lakehouse analítico · datos financieros públicos de Colombia</div>
+          <h1 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.02; letter-spacing: -0.02em; max-width: 16ch; text-wrap: balance;">TRM, inflación y tasa de intervención en un solo modelo</h1>
+          <p style="margin: 0; max-width: 62ch; font-size: 17px; color: var(--color-neutral-800); text-wrap: pretty;">Finco descarga datos públicos de datos.gov.co y del Banco de la República, los limpia en capas bronze, silver y gold con dbt y los publica en un mart mensual listo para consultar, comparar y descargar.</p>
+        </header>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); border-top: 2px solid var(--color-text); border-bottom: 2px solid var(--color-divider);">
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
+            <div style="padding: var(--space-4) var(--space-4) var(--space-4) 0; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--color-divider); margin-right: var(--space-4);">
+              <div style="font-size: 12px; color: var(--color-neutral-700);">{{ f.label }}</div>
+              <div style="font-family: var(--font-heading); font-weight: 800; font-size: 26px; line-height: 1.1;">{{ f.value }}</div>
+              <div style="font-size: 12px; color: var(--color-neutral-700);">{{ f.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <div style="display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap;">
+            <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 22px;">Indicadores principales</h2>
+            <span style="font-size: 13px; color: var(--color-neutral-700);">{{ rangeLabel }}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); border-top: 2px solid var(--color-text); border-left: 1px solid var(--color-divider);">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="padding: var(--space-4); display: flex; flex-direction: column; gap: 6px; border-right: 1px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+                <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--color-neutral-800);">
+                  <span style="width: 12px; height: 3px; background: {{ k.color }};"></span>{{ k.label }}
+                </div>
+                <div style="font-family: var(--font-heading); font-weight: 800; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums;">{{ k.value }}</div>
+                <div style="font-size: 12px; color: var(--color-neutral-700);">{{ k.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 22px;">Cómo fluyen los datos</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border-top: 2px solid var(--color-text);">
+            <sc-for list="{{ flow }}" as="s" hint-placeholder-count="4">
+              <div style="padding: var(--space-4) var(--space-4) var(--space-4) 0; border-bottom: 1px solid var(--color-divider); display: flex; flex-direction: column; gap: 6px;">
+                <div style="font-size: 12px; font-weight: 600; color: var(--color-accent-700); font-variant-numeric: tabular-nums;">{{ s.num }} →</div>
+                <div style="font-weight: 700; font-size: 17px;">{{ s.title }}</div>
+                <div style="font-size: 13px; color: var(--color-neutral-800); text-wrap: pretty;">{{ s.body }}</div>
+                <code style="font-size: 12px; background: var(--color-surface); padding: 4px 6px; align-self: flex-start;">{{ s.cmd }}</code>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isAnalisis }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="02 Análisis" style="display: flex; flex-direction: column; gap: var(--space-6);">
+        <header style="display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 2px solid var(--color-divider);">
+          <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); font-weight: 600;">02 · Análisis</div>
+          <h1 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 36px; line-height: 1.05;">TRM frente a inflación y tasa</h1>
+          <div style="font-size: 14px; color: var(--color-neutral-700);">{{ rangeLabel }} · {{ prevLabel }}</div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); border-top: 2px solid var(--color-text); border-left: 1px solid var(--color-divider);">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="padding: var(--space-4); display: flex; flex-direction: column; gap: 6px; border-right: 1px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+              <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--color-neutral-800);">
+                <span style="width: 12px; height: 3px; background: {{ k.color }};"></span>{{ k.label }}
+              </div>
+              <div style="font-family: var(--font-heading); font-weight: 800; font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums;">{{ k.value }}</div>
+              <div style="font-size: 13px; font-weight: 600; color: {{ k.deltaColor }}; font-variant-numeric: tabular-nums;">{{ k.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+            <sc-for list="{{ legend }}" as="l" hint-placeholder-count="3">
+              <button onClick="{{ l.toggle }}" style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--color-divider); background: transparent; color: var(--color-text); font: inherit; font-size: 13px; cursor: pointer; opacity: {{ l.opacity }};">
+                <span style="width: 16px; height: 0; border-top: 3px {{ l.dashStyle }} {{ l.color }};"></span>{{ l.label }}<span style="font-size: 11px; color: var(--color-neutral-700);">{{ l.axisLabel }}</span>
+              </button>
+            </sc-for>
+            <label style="display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: 13px; cursor: pointer;">
+              <input type="checkbox" checked="{{ showBands }}" onChange="{{ toggleBands }}" style="accent-color: var(--color-accent);">Marcar cambios de tasa
+            </label>
+          </div>
+          <div ref="{{ mainRef }}" style="width: 100%; border-top: 2px solid var(--color-text); padding-top: var(--space-2);">{{ mainChart }}</div>
+          <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; font-size: 12px; color: var(--color-neutral-700);">
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; background: var(--color-accent-100); border: 1px solid var(--color-divider);"></span>Ciclo de subidas</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; background: var(--color-neutral-200); border: 1px solid var(--color-divider);"></span>Ciclo de recortes</span>
+            <span>Eje izquierdo: COP por dólar · eje derecho: porcentaje</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6);">
+          <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+            <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 20px;">Tasa real</h2>
+            <div style="font-size: 13px; color: var(--color-neutral-700);">Tasa de intervención descontada la inflación anual</div>
+            <div ref="{{ realRef }}" style="width: 100%; border-top: 2px solid var(--color-text); padding-top: var(--space-2);">{{ realChart }}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+            <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 20px;">Lectura del periodo</h2>
+            <div style="font-size: 13px; color: var(--color-neutral-700);">Generada a partir de los datos filtrados</div>
+            <div style="border-top: 2px solid var(--color-text); padding-top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3);">
+              <sc-for list="{{ lectura }}" as="p" hint-placeholder-count="3">
+                <p style="margin: 0; font-size: 16px; line-height: 1.55; max-width: 60ch; text-wrap: pretty;">{{ p.text }}</p>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isDatos }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="03 Datos" style="display: flex; flex-direction: column; gap: var(--space-6);">
+        <header style="display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 2px solid var(--color-divider);">
+          <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); font-weight: 600;">03 · Datos</div>
+          <h1 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 36px; line-height: 1.05;">Consulta y descarga</h1>
+          <div style="font-size: 14px; color: var(--color-neutral-700);">{{ rangeLabel }}</div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6); align-items: end;">
+          <div class="field">
+            <label>Conjunto</label>
+            <div class="seg" style="display: flex;">
+              <sc-for list="{{ datasets }}" as="d" hint-placeholder-count="2">
+                <label class="seg-opt" style="flex: 1;"><input type="radio" name="conjunto" checked="{{ d.on }}" onChange="{{ d.pick }}">{{ d.label }}</label>
+              </sc-for>
+            </div>
+          </div>
+          <div class="field">
+            <label>Columnas visibles</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ colChips }}" as="c" hint-placeholder-count="5">
+                <button onClick="{{ c.toggle }}" style="padding: 5px 10px; border: 1px solid var(--color-divider); font: inherit; font-size: 12px; cursor: pointer; background: {{ c.bg }}; color: {{ c.fg }};">{{ c.name }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; border-top: 2px solid var(--color-text); padding-top: var(--space-3);">
+          <div style="display: flex; flex-direction: column;">
+            <div style="font-weight: 700; font-size: 17px;">{{ dsSummary }}</div>
+            <div style="font-size: 13px; color: var(--color-neutral-700);">{{ dsNote }}</div>
+          </div>
+          <button class="btn btn-primary" onClick="{{ download }}" style="margin-left: auto; min-width: 220px; justify-content: space-between;">
+            <span>Descargar CSV</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+          </button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="table" style="font-variant-numeric: tabular-nums;">
+            <thead><tr>
+              <sc-for list="{{ previewCols }}" as="h" hint-placeholder-count="5"><th>{{ h.name }}</th></sc-for>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ previewRows }}" as="r" hint-placeholder-count="10">
+                <tr><sc-for list="{{ r.cells }}" as="c"><td>{{ c.v }}</td></sc-for></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size: 12px; color: var(--color-neutral-700);">{{ fileName }}</div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isCalidad }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="04 Calidad y linaje" style="display: flex; flex-direction: column; gap: var(--space-8);">
+        <header style="display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-4); border-bottom: 2px solid var(--color-divider);">
+          <div style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); font-weight: 600;">04 · Calidad y linaje</div>
+          <h1 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 36px; line-height: 1.05;">Pruebas dbt y origen de cada columna</h1>
+          <div style="font-size: 14px; color: var(--color-neutral-700);">{{ artifactCaption }}</div>
+        </header>
+
+        <sc-if value="{{ hasArtifacts }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: var(--space-8);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); border-top: 2px solid var(--color-text); border-left: 1px solid var(--color-divider);">
+              <sc-for list="{{ qFacts }}" as="f" hint-placeholder-count="4">
+                <div style="padding: var(--space-4); display: flex; flex-direction: column; gap: 6px; border-right: 1px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+                  <div style="font-size: 13px; color: var(--color-neutral-800);">{{ f.label }}</div>
+                  <div style="font-family: var(--font-heading); font-weight: 800; font-size: 30px; line-height: 1.05; font-variant-numeric: tabular-nums;">{{ f.value }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <div style="display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+                <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 22px;">Pruebas</h2>
+                <div class="seg" style="margin-left: auto;">
+                  <sc-for list="{{ layerOpts }}" as="o" hint-placeholder-count="3">
+                    <label class="seg-opt"><input type="radio" name="capa" checked="{{ o.on }}" onChange="{{ o.pick }}">{{ o.label }}</label>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="max-height: 440px; overflow-y: auto; border-top: 2px solid var(--color-text);">
+                <table class="table">
+                  <thead><tr><th>Modelo</th><th>Capa</th><th>Columna</th><th>Prueba</th><th>Estado</th></tr></thead>
+                  <tbody>
+                    <sc-for list="{{ tests }}" as="t" hint-placeholder-count="8">
+                      <tr>
+                        <td style="font-weight: 600;">{{ t.model }}</td>
+                        <td>{{ t.layer }}</td>
+                        <td>{{ t.col }}</td>
+                        <td>{{ t.test }}</td>
+                        <td><span class="tag tag-neutral" style="font-weight: 700;">PASS</span></td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 22px;">Linaje de mart_mensual</h2>
+              <div style="display: flex; flex-direction: column; border-top: 2px solid var(--color-text);">
+                <sc-for list="{{ lineage }}" as="l" hint-placeholder-count="5">
+                  <div style="display: grid; grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--color-divider);">
+                    <div style="font-weight: 700;">{{ l.col }}</div>
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px;">
+                      <sc-for list="{{ l.chain }}" as="n">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                          <span style="padding: 3px 8px; background: var(--color-surface); border: 1px solid var(--color-divider);">{{ n.name }}</span>
+                          <span style="color: var(--color-accent-700); font-weight: 700;">{{ n.arrow }}</span>
+                        </span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ noArtifacts }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: var(--space-3); border-top: 2px solid var(--color-accent); padding-top: var(--space-4); max-width: 760px;">
+            <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; font-size: 22px;">No se encontraron los artefactos de dbt</h2>
+            <p style="margin: 0; text-wrap: pretty;">La app busca <strong>run_results.json</strong> (resultado de las pruebas) y <strong>manifest.json</strong> (linaje por columna) en la carpeta indicada por DBT_TARGET_DIR. Monta la carpeta target del proyecto dbt como volumen de solo lectura en el servicio de la app:</p>
+            <pre style="margin: 0; padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-divider); font-size: 13px; line-height: 1.6; overflow-x: auto;">services:
+  app:
+    environment:
+      DBT_TARGET_DIR: /app/dbt_target
+    volumes:
+      - ./dbt/target:/app/dbt_target:ro</pre>
+            <p style="margin: 0; font-size: 13px; color: var(--color-neutral-700);">Después: docker compose run --rm pipeline y docker compose up -d app. Esta página no muestra resultados de pruebas sin esos archivos.</p>
+          </div>
+        </sc-if>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4); align-items: center; border-top: 2px solid var(--color-text); padding-top: var(--space-4);">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="font-weight: 700; font-size: 17px;">Tablero macroeconómico en Metabase</div>
+            <div style="font-size: 13px; color: var(--color-neutral-700);">{{ metabaseCaption }}</div>
+          </div>
+          <a class="btn btn-secondary" href="{{ metabaseUrl }}" target="_blank" rel="noopener" style="color: var(--color-text); min-width: 200px; justify-content: space-between;">
+            <span>Abrir Metabase</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg>
+          </a>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;paginaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Inicio&quot;,&quot;Análisis&quot;,&quot;Datos&quot;,&quot;Calidad y linaje&quot;],&quot;default&quot;:&quot;Inicio&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;artefactosDbt&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;metabaseUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;http://localhost:3000&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const N = 81;
+
+// Módulo de constantes: una entrada por serie. Sumar usura, Brent, Fed o PIB = sumar una fila.
+const SERIES = [
+  { key: 'trm',  col: 'trm_promedio',    label: 'TRM promedio',          unit: 'COP', axis: 'left',  color: 'var(--color-accent)',      dash: null, step: false },
+  { key: 'inf',  col: 'inflacion_anual', label: 'Inflación anual',       unit: '%',   axis: 'right', color: 'var(--color-text)',        dash: null, step: false },
+  { key: 'tasa', col: 'tasa_vigente',    label: 'Tasa de intervención',  unit: '%',   axis: 'right', color: 'var(--color-neutral-500)', dash: '6 4', step: true }
+];
+const PAGES = [
+  { id: 'inicio', num: '01', label: 'Inicio' },
+  { id: 'analisis', num: '02', label: 'Análisis' },
+  { id: 'datos', num: '03', label: 'Datos' },
+  { id: 'calidad', num: '04', label: 'Calidad y linaje' }
+];
+
+function smooth(anch, i) {
+  for (let k = 0; k < anch.length - 1; k++) {
+    const [a, va] = anch[k], [b, vb] = anch[k + 1];
+    if (i >= a && i <= b) { const t = (i - a) / (b - a); const s = t * t * (3 - 2 * t); return va + (vb - va) * s; }
+  }
+  return anch[anch.length - 1][1];
+}
+function fisher(t, p) { return ((1 + t / 100) / (1 + p / 100) - 1) * 100; }
+function buildData() {
+  const trmA = [[0,3320],[2,4060],[11,3470],[17,3700],[23,3980],[29,3900],[33,4950],[35,4800],[41,4170],[47,3990],[53,4000],[59,4400],[65,4100],[71,3850],[80,3920]];
+  const infA = [[0,3.6],[11,1.6],[23,5.6],[35,13.1],[38,13.3],[47,9.3],[59,5.2],[71,5.1],[80,4.6]];
+  const tasaCh = {0:4.25,2:3.75,3:3.25,4:2.75,5:2.5,6:2.25,7:2.0,8:1.75,20:2.0,22:2.5,23:3.0,24:4.0,26:5.0,27:6.0,29:7.5,30:9.0,32:10.0,34:11.0,35:12.0,36:12.75,38:13.25,47:13.0,48:12.75,50:12.25,52:11.75,54:11.25,56:10.75,59:9.5,64:9.25};
+  const rows = []; let tasa = 4.25, ipc = 104.9;
+  for (let i = 0; i < N; i++) {
+    if (tasaCh[i] != null) tasa = tasaCh[i];
+    const y = 2020 + Math.floor(i / 12), m = i % 12;
+    const trm = smooth(trmA, i) + 28 * Math.sin(i * 1.7) + 12 * Math.cos(i * 0.9);
+    const inf = smooth(infA, i) + 0.12 * Math.sin(i * 2.3);
+    if (i > 0) ipc = ipc * Math.pow(1 + inf / 100, 1 / 12);
+    rows.push({ i, y, m, ym: y + '-' + String(m + 1).padStart(2, '0'), label: MES[m] + ' ' + y, short: MES[m] + ' ' + String(y).slice(2), trm, inf, tasa, ipc, real: fisher(tasa, inf) });
+  }
+  return rows;
+}
+const DATA = buildData();
+const CHANGES = DATA.filter((r, i) => i > 0 && r.tasa !== DATA[i - 1].tasa).map(r => ({ i: r.i, d: r.tasa - DATA[r.i - 1].tasa }));
+const BANDS = (() => {
+  const out = [];
+  CHANGES.forEach(c => {
+    const last = out[out.length - 1], dir = Math.sign(c.d);
+    if (last && last.dir === dir && c.i - last.b <= 3) last.b = c.i; else out.push({ a: c.i, b: c.i, dir });
+  });
+  return out;
+})();
+const TESTS = [
+  ['stg_trm','fecha','not_null'],['stg_trm','fecha','unique'],['stg_trm','valor','not_null'],['stg_trm','valor','accepted_range (1.000–10.000)'],
+  ['stg_ipc','anio_mes','not_null'],['stg_ipc','anio_mes','unique'],['stg_ipc','ipc','not_null'],['stg_ipc','inflacion_anual','not_null'],['stg_ipc','inflacion_anual','accepted_range (−5–30)'],
+  ['stg_tasa','fecha_inicio','not_null'],['stg_tasa','fecha_inicio','unique'],['stg_tasa','tasa','not_null'],['stg_tasa','tasa','accepted_range (0–30)'],['stg_tasa','fecha_fin','fecha_fin ≥ fecha_inicio'],
+  ['dim_fecha','fecha','not_null'],['dim_fecha','fecha','unique'],['dim_fecha','anio','not_null'],['dim_fecha','mes','not_null'],['dim_fecha','mes','accepted_values (1–12)'],
+  ['fct_trm_diaria','fecha','not_null'],['fct_trm_diaria','fecha','unique'],['fct_trm_diaria','fecha','relationships → dim_fecha'],['fct_trm_diaria','valor','not_null'],
+  ['fct_ipc_mensual','anio_mes','not_null'],['fct_ipc_mensual','anio_mes','unique'],['fct_ipc_mensual','anio_mes','relationships → dim_fecha'],['fct_ipc_mensual','ipc','not_null'],
+  ['fct_tasa_vigencia','fecha_inicio','not_null'],['fct_tasa_vigencia','fecha_inicio','relationships → dim_fecha'],['fct_tasa_vigencia','tasa','not_null'],['fct_tasa_vigencia','vigencia','sin traslapes'],
+  ['mart_mensual','anio_mes','not_null'],['mart_mensual','anio_mes','unique'],['mart_mensual','anio_mes','meses continuos'],['mart_mensual','anio_mes','relationships → dim_fecha'],
+  ['mart_mensual','trm_promedio','not_null'],['mart_mensual','trm_promedio','accepted_range (1.000–10.000)'],['mart_mensual','ipc','not_null'],['mart_mensual','inflacion_anual','not_null'],
+  ['mart_mensual','tasa_vigente','not_null'],['mart_mensual','tasa_vigente','accepted_range (0–30)'],['mart_mensual','(tabla)','row_count = 81']
+];
+const LINEAGE = [
+  ['anio_mes', ['dim_fecha.anio_mes', 'generado en dbt']],
+  ['trm_promedio', ['avg(fct_trm_diaria.valor)', 'silver.trm.valor', 'bronze.trm_raw.valor', 'API Socrata · datos.gov.co']],
+  ['ipc', ['fct_ipc_mensual.ipc', 'silver.ipc.ipc', 'bronze.ipc_raw', 'CSV Banco de la República']],
+  ['inflacion_anual', ['fct_ipc_mensual.inflacion_anual', 'silver.ipc.inflacion_anual', 'bronze.ipc_raw', 'CSV Banco de la República']],
+  ['tasa_vigente', ['fct_tasa_vigencia.tasa (vigencia que cubre el mes)', 'silver.tasa.tasa', 'bronze.tasa_raw', 'CSV Banco de la República']]
+];
+
+const nf = (v, d) => v.toLocaleString('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 2) => nf(v, d) + ' %';
+const signed = (v, d, u) => (v > 0 ? '+' : v < 0 ? '−' : '±') + nf(Math.abs(v), d) + u;
+
+function niceScale(lo, hi, count) {
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const raw = (hi - lo) / count, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);
+  const a = Math.floor(lo / step) * step, b = Math.ceil(hi / step) * step, ticks = [];
+  for (let v = a; v <= b + step / 2; v += step) ticks.push(+v.toFixed(6));
+  return { a, b, ticks };
+}
+
+function drawChart(h, o) {
+  const { rows, series, w, H } = o, n = rows.length;
+  const left = series.filter(s => s.axis === 'left'), right = series.filter(s => s.axis === 'right');
+  const L = left.length ? 64 : 16, R = right.length ? 52 : 16, T = 22, B = 30;
+  const iw = Math.max(10, w - L - R), ih = H - T - B;
+  const x = i => L + (n <= 1 ? iw / 2 : (i / (n - 1)) * iw);
+  const mk = list => { if (!list.length) return null; const vals = rows.flatMap(r => list.map(s => r[s.key])); let lo = Math.min(...vals), hi = Math.max(...vals); if (list[0].unit === '%') { lo = Math.min(0, lo); } else { const p = (hi - lo) * 0.08; lo -= p; hi += p; } const sc = niceScale(lo, hi, 5); sc.y = v => T + ih - ((v - sc.a) / (sc.b - sc.a)) * ih; return sc; };
+  const sl = mk(left), sr = mk(right), grid = sl || sr;
+  const fmtAxis = (s, v) => s.unit === 'COP' ? nf(v, 0) : nf(v, Number.isInteger(v) ? 0 : 1);
+  const kids = [];
+  if (o.bands) o.bands.forEach((b, k) => {
+    const x0 = Math.max(L, x(b.a - 0.5)), x1 = Math.min(L + iw, x(b.b + 0.5));
+    if (x1 <= x0) return;
+    kids.push(h('rect', { key: 'b' + k, x: x0, y: T, width: x1 - x0, height: ih, style: { fill: b.dir > 0 ? 'var(--color-accent-100)' : 'var(--color-neutral-200)' } }));
+    if (x1 - x0 > 54) kids.push(h('text', { key: 'bt' + k, x: x0 + 6, y: T + 14, style: { fill: 'var(--color-neutral-700)', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase' } }, b.dir > 0 ? 'Subidas' : 'Recortes'));
+  });
+  grid.ticks.forEach((t, k) => {
+    const y = grid.y(t);
+    kids.push(h('line', { key: 'g' + k, x1: L, x2: L + iw, y1: y, y2: y, style: { stroke: 'var(--color-divider)', strokeWidth: 1, opacity: 0.5 } }));
+  });
+  if (sl) sl.ticks.forEach((t, k) => kids.push(h('text', { key: 'tl' + k, x: L - 8, y: sl.y(t) + 4, textAnchor: 'end', style: { fill: 'var(--color-neutral-700)', fontSize: 11, fontVariantNumeric: 'tabular-nums' } }, fmtAxis(left[0], t))));
+  if (sr) sr.ticks.forEach((t, k) => kids.push(h('text', { key: 'tr' + k, x: L + iw + 8, y: sr.y(t) + 4, style: { fill: 'var(--color-neutral-700)', fontSize: 11, fontVariantNumeric: 'tabular-nums' } }, fmtAxis(right[0], t))));
+  if (sl) kids.push(h('text', { key: 'ul', x: L - 8, y: 10, textAnchor: 'end', style: { fill: 'var(--color-neutral-700)', fontSize: 11, fontWeight: 600 } }, left[0].unit));
+  if (sr) kids.push(h('text', { key: 'ur', x: L + iw + 8, y: 10, style: { fill: 'var(--color-neutral-700)', fontSize: 11, fontWeight: 600 } }, '%'));
+  const zs = sr || sl;
+  if (zs && zs.a < 0 && zs.b > 0) kids.push(h('line', { key: 'z', x1: L, x2: L + iw, y1: zs.y(0), y2: zs.y(0), style: { stroke: 'var(--color-text)', strokeWidth: 1 } }));
+  kids.push(h('line', { key: 'base', x1: L, x2: L + iw, y1: T + ih, y2: T + ih, style: { stroke: 'var(--color-text)', strokeWidth: 2 } }));
+  const every = n > 30 ? null : Math.max(1, Math.ceil(n / 8));
+  rows.forEach((r, i) => {
+    const show = every ? i % every === 0 : (r.m === 0 || i === 0);
+    if (!show) return;
+    if (!every && i === 0 && r.m !== 0 && rows.length > 1 && r.m > 8) return;
+    kids.push(h('text', { key: 'x' + i, x: x(i), y: T + ih + 18, textAnchor: i === 0 ? 'start' : 'middle', style: { fill: 'var(--color-neutral-700)', fontSize: 11 } }, every ? r.short : String(r.y)));
+  });
+  series.forEach(s => {
+    const sc = s.axis === 'left' ? sl : sr;
+    let d = '';
+    rows.forEach((r, i) => { const px = x(i).toFixed(1), py = sc.y(r[s.key]).toFixed(1); d += i === 0 ? `M${px},${py}` : s.step ? `H${px}V${py}` : `L${px},${py}`; });
+    kids.push(h('path', { key: 's' + s.key, d, style: { fill: 'none', stroke: s.color, strokeWidth: s.key === 'trm' ? 2.5 : 2, strokeDasharray: s.dash || 'none', strokeLinejoin: 'round' } }));
+  });
+  let tip = null;
+  const hi = o.hover;
+  if (hi != null && hi < n) {
+    const hx = x(hi), r = rows[hi];
+    kids.push(h('line', { key: 'hl', x1: hx, x2: hx, y1: T, y2: T + ih, style: { stroke: 'var(--color-text)', strokeWidth: 1 } }));
+    series.forEach(s => { const sc = s.axis === 'left' ? sl : sr; kids.push(h('rect', { key: 'hd' + s.key, x: hx - 4, y: sc.y(r[s.key]) - 4, width: 8, height: 8, style: { fill: s.color, stroke: 'var(--color-bg)', strokeWidth: 1.5 } })); });
+    const ch = CHANGES.find(c => c.i === r.i);
+    const lines = series.map(s => h('div', { key: s.key, style: { display: 'flex', alignItems: 'center', gap: 8 } },
+      h('span', { style: { width: 12, height: 0, borderTop: `3px ${s.dash ? 'dashed' : 'solid'} ${s.color}` } }),
+      h('span', { style: { flex: 1 } }, s.label),
+      h('strong', { style: { fontVariantNumeric: 'tabular-nums' } }, s.unit === 'COP' ? '$ ' + nf(r[s.key], 2) : pct(r[s.key]))));
+    if (ch) lines.push(h('div', { key: 'ch', style: { color: 'var(--color-accent-700)', fontWeight: 600 } }, 'Cambio de tasa: ' + signed(ch.d * 100, 0, ' pb')));
+    const tw = 230, flip = hx + 14 + tw > w;
+    tip = h('div', { style: { position: 'absolute', top: 8, left: flip ? hx - tw - 14 : hx + 14, width: tw, padding: '10px 12px', background: 'var(--color-bg)', border: '2px solid var(--color-text)', boxShadow: 'var(--shadow-md)', fontSize: 12, display: 'flex', flexDirection: 'column', gap: 4, pointerEvents: 'none', color: 'var(--color-text)' } },
+      h('div', { style: { fontWeight: 700, fontSize: 13 } }, r.label), ...lines);
+  }
+  kids.push(h('rect', { key: 'ov', x: L, y: T, width: iw, height: ih, style: { fill: 'transparent', cursor: 'crosshair' },
+    onMouseMove: e => { const bb = e.currentTarget.ownerSVGElement.getBoundingClientRect(); const px = e.clientX - bb.left; const i = n <= 1 ? 0 : Math.round(((px - L) / iw) * (n - 1)); o.onHover(Math.max(0, Math.min(n - 1, i))); },
+    onMouseLeave: () => o.onHover(null) }));
+  return h('div', { style: { position: 'relative', width: '100%' } },
+    h('svg', { width: w, height: H, style: { display: 'block', fontFamily: 'var(--font-body)' } }, kids), tip);
+}
+
+class Component extends DCLogic {
+  state = {
+    page: null, s: 69, e: 80, dark: false,
+    off: {}, showBands: true, hover: {},
+    ds: 'mart', colsOff: {}, layer: 'todas', w: { main: 900, real: 520 }
+  };
+  componentDidMount() {
+    try { const t = localStorage.getItem('finco_tema'); if (t) this.setState({ dark: t === 'oscuro' }); } catch (e) {}
+
+  }
+  componentWillUnmount() { this.ro && this.ro.disconnect(); }
+  chartRef(k) {
+    this._cr = this._cr || {};
+    if (!this.ro) this.ro = new ResizeObserver(ents => {
+      const w = { ...this.state.w }; let ch = false;
+      ents.forEach(en => { const kk = en.target.dataset.chart, v = Math.round(en.contentRect.width); if (kk && v && w[kk] !== v) { w[kk] = v; ch = true; } });
+      if (ch) this.setState({ w });
+    });
+    if (!this._cr[k]) this._cr[k] = el => {
+      if (!el) return;
+      el.dataset.chart = k; this.ro.observe(el);
+      const v = el.clientWidth;
+      if (v && this.state.w[k] !== v) setTimeout(() => this.setState(s => ({ w: { ...s.w, [k]: v } })), 0);
+    };
+    return this._cr[k];
+  }
+  setTheme(dark) { this.setState({ dark }); try { localStorage.setItem('finco_tema', dark ? 'oscuro' : 'claro'); } catch (e) {} }
+  setRange(s, e) { s = Math.max(0, Math.min(N - 1, s)); e = Math.max(s, Math.min(N - 1, e)); this.setState({ s, e, hover: {} }); }
+
+  kpis(rows) {
+    const { s, e } = this.state, len = e - s + 1, ps = s - len, hasPrev = ps >= 0;
+    const prev = hasPrev ? DATA.slice(ps, s) : null;
+    const varTrm = r => (r[r.length - 1].trm / r[0].trm - 1) * 100;
+    const mean = r => r.reduce((a, x) => a + x.inf, 0) / r.length;
+    const last = rows[rows.length - 1], pLast = s > 0 ? DATA[s - 1] : null;
+    const items = [
+      { label: 'Variación de la TRM', color: SERIES[0].color, value: signed(varTrm(rows), 1, ' %'), note: '$ ' + nf(rows[0].trm, 0) + ' → $ ' + nf(last.trm, 0), d: hasPrev && len > 1 ? varTrm(rows) - varTrm(prev) : null, u: ' pp', good: 0 },
+      { label: 'Inflación promedio', color: SERIES[1].color, value: pct(mean(rows)), note: 'Cierre del periodo: ' + pct(last.inf), d: hasPrev ? mean(rows) - mean(prev) : null, u: ' pp' },
+      { label: 'Tasa vigente', color: SERIES[2].color, value: pct(last.tasa), note: 'Vigente a ' + last.label, d: pLast ? last.tasa - pLast.tasa : null, u: ' pp' },
+      { label: 'Tasa real', color: 'var(--color-neutral-800)', value: pct(last.real), note: 'Tasa vigente descontada la inflación', d: pLast ? last.real - pLast.real : null, u: ' pp' }
+    ];
+    return items.map(k => ({ ...k, delta: k.d == null ? 'Sin periodo anterior comparable' : (k.d > 0 ? '▲ ' : k.d < 0 ? '▼ ' : '') + signed(k.d, 2, k.u) + ' vs. periodo anterior', deltaColor: k.d == null ? 'var(--color-neutral-700)' : k.d > 0 ? 'var(--color-accent-700)' : 'var(--color-neutral-800)' }));
+  }
+  lectura(rows) {
+    const f = rows[0], l = rows[rows.length - 1];
+    const v = (l.trm / f.trm - 1) * 100;
+    const mean = rows.reduce((a, x) => a + x.inf, 0) / rows.length;
+    const ch = CHANGES.filter(c => c.i > f.i && c.i <= l.i);
+    const up = ch.filter(c => c.d > 0).length, down = ch.length - up;
+    const p = [];
+    p.push(`Entre ${f.label} y ${l.label} la TRM promedio pasó de $ ${nf(f.trm, 0)} a $ ${nf(l.trm, 0)}, una variación de ${signed(v, 1, ' %')}.`);
+    p.push(`La inflación anual promedió ${pct(mean)} y cerró en ${pct(l.inf)}${l.inf < f.inf ? ', por debajo del inicio del periodo' : ', por encima del inicio del periodo'}.`);
+    p.push(ch.length ? `El Banco de la República cambió la tasa ${ch.length} ${ch.length === 1 ? 'vez' : 'veces'} (${up} ${up === 1 ? 'subida' : 'subidas'}, ${down} ${down === 1 ? 'recorte' : 'recortes'}) y la dejó en ${pct(l.tasa)}, con una tasa real de ${pct(l.real)}.` : `La tasa de intervención se mantuvo en ${pct(l.tasa)} durante todo el periodo, con una tasa real de cierre de ${pct(l.real)}.`);
+    return p.map(text => ({ text }));
+  }
+  dataset(rows) {
+    if (this.state.ds === 'mart') {
+      const cols = ['anio_mes', 'trm_promedio', 'ipc', 'inflacion_anual', 'tasa_vigente'];
+      return { cols, rows: rows.map(r => ({ anio_mes: r.ym, trm_promedio: r.trm.toFixed(2), ipc: r.ipc.toFixed(2), inflacion_anual: r.inf.toFixed(2), tasa_vigente: r.tasa.toFixed(2) })),
+        fmt: { trm_promedio: v => nf(+v, 2), ipc: v => nf(+v, 2), inflacion_anual: v => nf(+v, 2), tasa_vigente: v => nf(+v, 2) } };
+    }
+    const out = [];
+    rows.forEach(r => {
+      const days = new Date(r.y, r.m + 1, 0).getDate();
+      for (let d = 1; d <= days; d++) {
+        const wd = new Date(r.y, r.m, d).getDay(); if (wd === 0 || wd === 6) continue;
+        const v = r.trm + 34 * Math.sin(r.i * 3.1 + d * 0.45) + 14 * Math.sin(d * 1.3);
+        out.push({ fecha: r.ym + '-' + String(d).padStart(2, '0'), valor: v.toFixed(2) });
+      }
+    });
+    return { cols: ['fecha', 'valor'], rows: out.reverse(), fmt: { valor: v => nf(+v, 2) } };
+  }
+
+  renderVals() {
+    const h = React.createElement;
+    const st = this.state, P = this.props;
+    const pageMap = { 'Inicio': 'inicio', 'Análisis': 'analisis', 'Datos': 'datos', 'Calidad y linaje': 'calidad' };
+    const page = st.page || pageMap[P.paginaInicial] || 'inicio';
+    const rows = DATA.slice(st.s, st.e + 1);
+    const len = rows.length;
+    const rangeLabel = `${rows[0].label} – ${rows[len - 1].label} · ${len} ${len === 1 ? 'mes' : 'meses'}`;
+    const ps = st.s - len;
+    const prevLabel = ps >= 0 ? `Comparado con ${DATA[ps].label} – ${DATA[st.s - 1].label}` : 'Sin periodo anterior completo para comparar';
+    const cuts = [
+      { label: 'Último año', s: N - 12, e: N - 1 },
+      { label: 'Desde 2020', s: 0, e: N - 1 },
+      { label: '2023', s: 36, e: 47 }
+    ];
+    const kpis = this.kpis(rows);
+    const visible = SERIES.filter(s => !st.off[s.key]);
+    const bands = st.showBands ? BANDS.map(b => ({ ...b, a: b.a - st.s, b: b.b - st.s })) : null;
+    const mainChart = page === 'analisis' && visible.length ? drawChart(h, { rows, series: visible, w: st.w.main, H: 400, bands, hover: st.hover.main, onHover: i => this.setState({ hover: { ...st.hover, main: i } }) }) : null;
+    const realChart = page === 'analisis' ? drawChart(h, { rows, series: [{ key: 'real', label: 'Tasa real', unit: '%', axis: 'left', color: 'var(--color-text)', dash: null }], w: st.w.real, H: 260, bands, hover: st.hover.real, onHover: i => this.setState({ hover: { ...st.hover, real: i } }) }) : null;
+
+    const dsx = this.dataset(rows);
+    const visCols = dsx.cols.filter(c => !st.colsOff[st.ds + c]);
+    const fileName = `finco_${st.ds === 'mart' ? 'mart_mensual' : 'trm_diaria'}_${rows[0].ym}_${rows[len - 1].ym}.csv`;
+    const download = () => {
+      const csv = [visCols.join(','), ...dsx.rows.map(r => visCols.map(c => r[c]).join(','))].join('\n');
+      const url = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+      const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+    const hasArt = P.artefactosDbt ?? true;
+    const mbUrl = P.metabaseUrl || 'http://localhost:3000';
+    const layerOf = m => m.startsWith('stg_') ? 'silver' : 'gold';
+    const tests = TESTS.map(([model, col, test]) => ({ model, col, test, layer: layerOf(model) })).filter(t => st.layer === 'todas' || t.layer === st.layer);
+
+    return {
+      themeName: st.dark ? 'dark' : 'light',
+      isLight: !st.dark, isDark: st.dark,
+      setLight: () => this.setTheme(false), setDark: () => this.setTheme(true),
+      nav: PAGES.map(p => ({ ...p, go: () => this.setState({ page: p.id }), bg: p.id === page ? 'var(--color-text)' : 'transparent', fg: p.id === page ? 'var(--color-bg)' : 'var(--color-text)' })),
+      isInicio: page === 'inicio', isAnalisis: page === 'analisis', isDatos: page === 'datos', isCalidad: page === 'calidad',
+      shortcuts: cuts.map(c => ({ label: c.label, on: st.s === c.s && st.e === c.e, pick: () => this.setRange(c.s, c.e) })),
+      monthOpts: DATA.map(r => ({ v: String(r.i), label: r.label })),
+      startVal: String(st.s), endVal: String(st.e),
+      onStart: ev => this.setRange(+ev.target.value, Math.max(+ev.target.value, st.e)),
+      onEnd: ev => this.setRange(Math.min(st.s, +ev.target.value), +ev.target.value),
+      rangeCaption: `${len} de ${N} meses · datos de ene 2020 a sep 2026`,
+      rangeLabel, prevLabel,
+      facts: [
+        { label: 'Fuentes públicas', value: '3', note: 'TRM · IPC e inflación · tasa de intervención' },
+        { label: 'Periodo cubierto', value: '2020 – 2026', note: 'mart_mensual: ene 2020 a sep 2026, 81 filas' },
+        { label: 'Último dato', value: '30 sep 2026', note: 'TRM diaria; mensual hasta sep 2026' },
+        { label: 'Pruebas dbt', value: hasArt ? '42 / 42' : 'Sin leer', note: hasArt ? 'Todas en PASS en la última ejecución' : 'Falta montar dbt/target' }
+      ],
+      kpis,
+      flow: [
+        { num: '01', title: 'Fuentes', body: 'TRM diaria de datos.gov.co (API Socrata); IPC y tasa de intervención en CSV del Banco de la República.', cmd: 'bronze/' },
+        { num: '02', title: 'Pipeline', body: 'Limpieza y deduplicación en silver; modelo estrella y mart_mensual en gold. dbt corre 42 pruebas.', cmd: 'docker compose run --rm pipeline' },
+        { num: '03', title: 'Tablero', body: 'Metabase publica el Tablero macroeconómico sobre la capa gold.', cmd: mbUrl.replace(/^https?:\/\//, '') },
+        { num: '04', title: 'App', body: 'Esta app: análisis interactivo, consulta y descarga, calidad y linaje.', cmd: 'localhost:8501' }
+      ],
+      legend: SERIES.map(s => ({ label: s.label, color: s.color, dashStyle: s.dash ? 'dashed' : 'solid', axisLabel: s.axis === 'left' ? 'eje izq.' : 'eje der.', opacity: st.off[s.key] ? 0.4 : 1, toggle: () => this.setState({ off: { ...st.off, [s.key]: !st.off[s.key] } }) })),
+      showBands: st.showBands, toggleBands: () => this.setState({ showBands: !st.showBands }),
+      mainRef: this.chartRef('main'), realRef: this.chartRef('real'),
+      mainChart, realChart,
+      lectura: this.lectura(rows),
+      datasets: [{ id: 'mart', label: 'Mart mensual' }, { id: 'trm', label: 'TRM diaria' }].map(d => ({ ...d, on: st.ds === d.id, pick: () => this.setState({ ds: d.id }) })),
+      colChips: dsx.cols.map(c => {
+        const on = !st.colsOff[st.ds + c];
+        return { name: c, bg: on ? 'var(--color-text)' : 'transparent', fg: on ? 'var(--color-bg)' : 'var(--color-text)',
+          toggle: () => { if (on && visCols.length === 1) return; this.setState({ colsOff: { ...st.colsOff, [st.ds + c]: on } }); } };
+      }),
+      dsSummary: `${nf(dsx.rows.length, 0)} filas · ${visCols.length} ${visCols.length === 1 ? 'columna' : 'columnas'}`,
+      dsNote: `Vista previa de las primeras ${Math.min(12, dsx.rows.length)} filas. El CSV incluye exactamente estas columnas y todas las filas del periodo.`,
+      previewCols: visCols.map(name => ({ name })),
+      previewRows: dsx.rows.slice(0, 12).map(r => ({ cells: visCols.map(c => ({ v: dsx.fmt[c] ? dsx.fmt[c](r[c]) : r[c] })) })),
+      fileName: 'Archivo: ' + fileName,
+      download,
+      hasArtifacts: hasArt, noArtifacts: !hasArt,
+      artifactCaption: hasArt ? 'Leído de /app/dbt_target/run_results.json y manifest.json · ejecución del 1 nov 2026, 22:14' : 'Artefactos de dbt no disponibles en el contenedor',
+      qFacts: [
+        { label: 'Pruebas ejecutadas', value: '42' },
+        { label: 'En PASS', value: '42' },
+        { label: 'Fallidas o con aviso', value: '0' },
+        { label: 'Modelos cubiertos', value: '8' }
+      ],
+      layerOpts: [['todas', 'Todas'], ['silver', 'Silver'], ['gold', 'Gold']].map(([id, label]) => ({ label, on: st.layer === id, pick: () => this.setState({ layer: id }) })),
+      tests,
+      lineage: LINEAGE.map(([col, chain]) => ({ col, chain: chain.map((name, i) => ({ name, arrow: i < chain.length - 1 ? '←' : '' })) })),
+      metabaseUrl: mbUrl,
+      metabaseCaption: `${mbUrl} · configurable con la variable de entorno METABASE_URL`
+    };
+  }
+}
+</script>
+</body>
+</html>

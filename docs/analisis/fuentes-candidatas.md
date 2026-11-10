@@ -1,6 +1,6 @@
 # Fuentes de datos candidatas
 
-**Estado:** propuesta, fuera del alcance de la entrega final (20 de noviembre de 2026). Nada de esto está implementado.
+**Estado:** propuesta, fuera del alcance de la entrega final (20 de noviembre de 2026). Implementadas en la rama `feat/nuevas-fuentes`: tasa de usura (1), CDT a 90 días (2), Brent y tasa de la Fed (4). Pendientes: 3 y 5.
 **Fecha de verificación:** 2 de noviembre de 2026. Cada fuente se consultó directamente por su API pública.
 **Objetivo:** ampliar las fuentes del lakehouse para que un analista obtenga más contexto sobre la TRM, la
 inflación y las tasas de interés en Colombia.
